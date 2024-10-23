@@ -3,7 +3,7 @@
 
 #include "World/Pickup.h"
 #include "Components/InventoryComponent.h"
-#include "InteractionSystem/InteractionSystemCharacter.h"
+#include "InteractionSystem/DSCharacter.h"
 #include "Items/ItemBase.h"
 
 APickup::APickup()
@@ -33,7 +33,6 @@ void APickup::InitializePickup(const TSubclassOf<UItemBase> BaseClass, const int
 		ItemReference->ID = ItemData->ID;
 		ItemReference->ItemType = ItemData->ItemType;
 		ItemReference->ItemQuality = ItemData->ItemQuality;
-		ItemReference->NumericData = ItemData->NumericData;
 		ItemReference->TextData = ItemData->TextData;
 		ItemReference->AssetData = ItemData->AssetData;
 
@@ -50,7 +49,6 @@ void APickup::InitializeDrop(UItemBase* ItemToDrop, const int32 InQuantity)
 	ItemReference = ItemToDrop;
 
 	InQuantity <= 0 ? ItemReference->SetQuantity(1) : ItemReference->SetQuantity(InQuantity);
-	ItemReference->NumericData.Weight = ItemToDrop->GetItemSingleWeight();
 	PickupMesh->SetStaticMesh(ItemToDrop->AssetData.Mesh);
 	
 	UpdateInteractableData();
@@ -72,11 +70,19 @@ void APickup::EndFocus()
 	}
 }
 
-void APickup::Interact(AInteractionSystemCharacter* PlayerCharacter)
+bool APickup::CanInteract()
+{
+	return bCanInteract;
+}
+
+void APickup::Interact(ADSCharacter* PlayerCharacter)
 {
 	if (PlayerCharacter)
 	{
-		TakePickup(PlayerCharacter);
+		Cast<UPrimitiveComponent>(GetComponentByClass(UPrimitiveComponent::StaticClass()))->SetSimulatePhysics(false);
+		PickupMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		AttachToComponent(PlayerCharacter->GetMesh1P(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("AttachSocket"));
+		//TakePickup(PlayerCharacter);
 	}
 }
 
@@ -89,7 +95,7 @@ void APickup::UpdateInteractableData()
 	InteractableData = InstanceInteractableData;
 }
 
-void APickup::TakePickup(const AInteractionSystemCharacter* Taker)
+void APickup::TakePickup(const ADSCharacter* Taker)
 {
 	if (!IsPendingKillPending())
 	{

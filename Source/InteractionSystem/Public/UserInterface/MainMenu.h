@@ -6,7 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "MainMenu.generated.h"
 
-class AInteractionSystemCharacter;
+class ADSCharacter;
 
 UCLASS()
 class INTERACTIONSYSTEM_API UMainMenu : public UUserWidget
@@ -15,7 +15,7 @@ class INTERACTIONSYSTEM_API UMainMenu : public UUserWidget
 
 public:
 	UPROPERTY()
-	AInteractionSystemCharacter* PlayerCharacter;
+	ADSCharacter* PlayerCharacter;
 
 protected:
 	virtual void NativeOnInitialized() override;

@@ -36,9 +36,6 @@ public:
 	FItemTextData TextData;
 
 	UPROPERTY(VisibleAnywhere, Category = "Item")
-	FItemNumericData NumericData;
-
-	UPROPERTY(VisibleAnywhere, Category = "Item")
 	FItemAssetData AssetData;
 
 	bool bIsCopy;
@@ -52,19 +49,16 @@ public:
 	UItemBase* CreateItemCopy();
 
 	UFUNCTION(Category = "Item")
-	FORCEINLINE float GetItemStackWeight() const { return Quantity * NumericData.Weight; };
+	FORCEINLINE float GetItemBuyValue() const { return ItemStatistics.BuyValue; };
 
 	UFUNCTION(Category = "Item")
-	FORCEINLINE float GetItemSingleWeight() const { return NumericData.Weight; };
-
-	UFUNCTION(Category = "Item")
-	FORCEINLINE bool IsFullItemStack() const { return Quantity == NumericData.MaxStackSize;	};
+	FORCEINLINE float GetItemSellValue() const { return ItemStatistics.SellValue; };
 
 	UFUNCTION(Category = "Item")
 	void SetQuantity(const int32 NewQuantity);
 
 	UFUNCTION(Category = "Item")
-	virtual void Use(AInteractionSystemCharacter* Character);
+	virtual void Use(ADSCharacter* Character);
 	
 protected:
 	bool operator==(const FName& OtherID) const

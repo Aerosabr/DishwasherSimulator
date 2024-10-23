@@ -6,7 +6,7 @@
 #include "UObject/Interface.h"
 #include "InteractionInterface.generated.h"
 
-class AInteractionSystemCharacter;
+class ADSCharacter;
 
 UENUM()
 enum class EInteractableType : uint8
@@ -63,13 +63,14 @@ class INTERACTIONSYSTEM_API IInteractionInterface
 {
 	GENERATED_BODY()
 
-	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
+	FInteractableData InteractableData;
+	
 	virtual void BeginFocus();
 	virtual void EndFocus();
 	virtual void BeginInteract();
 	virtual void EndInteract();
-	virtual void Interact(AInteractionSystemCharacter* PlayerCharacter);
+	virtual void Interact(ADSCharacter* PlayerCharacter);
 
-	FInteractableData InteractableData;
+	virtual bool CanInteract();
 };

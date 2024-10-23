@@ -1,7 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "InteractionSystemGameMode.h"
-#include "InteractionSystemCharacter.h"
+#include "DSCharacter.h"
 #include "UObject/ConstructorHelpers.h"
 
 AInteractionSystemGameMode::AInteractionSystemGameMode()

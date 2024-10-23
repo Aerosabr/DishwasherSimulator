@@ -17,10 +17,8 @@ enum class EItemQuality : uint8
 UENUM()
 enum class EItemType : uint8
 {
-	Armor UMETA(DisplayName = "Armor"),
-	Weapon UMETA(DisplayName = "Weapon"),
-	Consumable UMETA(DisplayName = "Consumable"),
-	Mundane UMETA(DisplayName = "Mundane")
+	Soap UMETA(DisplayName = "Soap"),
+	Faucet UMETA(DisplayName = "Faucet")
 };
 
 USTRUCT()
@@ -29,13 +27,19 @@ struct FItemStatistics
 	GENERATED_USTRUCT_BODY()
 	
 	UPROPERTY(EditAnywhere)
-	float ArmorRating;
+	float FaucetPower;
 
 	UPROPERTY(EditAnywhere)
-	float DamageValue;
+	float FaucetWaterUsage;
 
 	UPROPERTY(EditAnywhere)
-	float RestorationAmount;
+	float SoapPower;
+	
+	UPROPERTY(EditAnywhere)
+	int SoapUsages;
+
+	UPROPERTY(EditAnywhere)
+	float BuyValue;
 	
 	UPROPERTY(EditAnywhere)
 	float SellValue;
@@ -57,21 +61,6 @@ struct FItemTextData
 	
 	UPROPERTY(EditAnywhere)
 	FText UsageText;
-};
-
-USTRUCT()
-struct FItemNumericData
-{
-	GENERATED_USTRUCT_BODY()
-
-	UPROPERTY(EditAnywhere)
-	float Weight;
-
-	UPROPERTY(EditAnywhere)
-	int32 MaxStackSize;
-
-	UPROPERTY(EditAnywhere)
-	bool bIsStackable;
 };
 
 USTRUCT()
@@ -105,9 +94,6 @@ struct FItemData : public FTableRowBase
 
 	UPROPERTY(EditAnywhere, Category = "Item Data")
 	FItemTextData TextData;
-
-	UPROPERTY(EditAnywhere, Category = "Item Data")
-	FItemNumericData NumericData;
 
 	UPROPERTY(EditAnywhere, Category = "Item Data")
 	FItemAssetData AssetData;

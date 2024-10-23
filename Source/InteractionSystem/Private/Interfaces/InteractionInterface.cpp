@@ -20,6 +20,11 @@ void IInteractionInterface::EndInteract()
 {
 }
 
-void IInteractionInterface::Interact(AInteractionSystemCharacter* PlayerCharacter)
+void IInteractionInterface::Interact(ADSCharacter* PlayerCharacter)
 {
+}
+
+bool IInteractionInterface::CanInteract()
+{
+	return false;
 }

@@ -2,7 +2,7 @@
 
 
 #include "TP_WeaponComponent.h"
-#include "InteractionSystemCharacter.h"
+#include "DSCharacter.h"
 #include "InteractionSystemProjectile.h"
 #include "GameFramework/PlayerController.h"
 #include "Camera/PlayerCameraManager.h"
@@ -66,7 +66,7 @@ void UTP_WeaponComponent::Fire()
 	}
 }
 
-bool UTP_WeaponComponent::AttachWeapon(AInteractionSystemCharacter* TargetCharacter)
+bool UTP_WeaponComponent::AttachWeapon(ADSCharacter* TargetCharacter)
 {
 	Character = TargetCharacter;
 

@@ -6,7 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "InteractionWidget.generated.h"
 
-class AInteractionSystemCharacter;
+class ADSCharacter;
 struct FInteractableData;
 class UTextBlock;
 class UProgressBar;
@@ -18,7 +18,7 @@ class INTERACTIONSYSTEM_API UInteractionWidget : public UUserWidget
 
 public:
 	UPROPERTY(VisibleAnywhere, Category = "Interaction Widget | Player Reference")
-	AInteractionSystemCharacter* PlayerReference;
+	ADSCharacter* PlayerReference;
 
 	void UpdateWidget(const FInteractableData* InteractableData) const;
 

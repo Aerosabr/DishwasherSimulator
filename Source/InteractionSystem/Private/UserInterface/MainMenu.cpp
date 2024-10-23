@@ -3,7 +3,7 @@
 
 #include "UserInterface/MainMenu.h"
 
-#include "InteractionSystem/InteractionSystemCharacter.h"
+#include "InteractionSystem/DSCharacter.h"
 
 void UMainMenu::NativeOnInitialized()
 {
@@ -14,7 +14,7 @@ void UMainMenu::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	PlayerCharacter = Cast<AInteractionSystemCharacter>(GetOwningPlayerPawn());
+	PlayerCharacter = Cast<ADSCharacter>(GetOwningPlayerPawn());
 }
 
 bool UMainMenu::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)

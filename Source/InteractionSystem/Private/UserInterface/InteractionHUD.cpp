@@ -23,6 +23,10 @@ void AInteractionHUD::BeginPlay()
 		InteractionWidget->AddToViewport(-1);
 		InteractionWidget->SetVisibility(ESlateVisibility::Collapsed);
 	}
+
+	CrosshairWidget = CreateWidget<UUserWidget>(GetWorld(), CrosshairClass);
+	CrosshairWidget->AddToViewport(5);
+	CrosshairWidget->SetVisibility(ESlateVisibility::Visible);
 }
 
 void AInteractionHUD::DisplayMenu()
@@ -67,6 +71,7 @@ void AInteractionHUD::ShowInteractionWidget() const
 {
 	if (InteractionWidget)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Show"))
 		InteractionWidget->SetVisibility(ESlateVisibility::Visible);
 	}
 }
@@ -75,6 +80,7 @@ void AInteractionHUD::HideInteractionWidget() const
 {
 	if (InteractionWidget)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Hide"))
 		InteractionWidget->SetVisibility(ESlateVisibility::Collapsed);
 	}
 }
@@ -85,6 +91,7 @@ void AInteractionHUD::UpdateInteractionWidget(const FInteractableData* Interacta
 	{
 		if (InteractionWidget->GetVisibility() == ESlateVisibility::Collapsed)
 		{
+			UE_LOG(LogTemp, Warning, TEXT("Show2"))
 			InteractionWidget->SetVisibility(ESlateVisibility::Visible);
 		}
 

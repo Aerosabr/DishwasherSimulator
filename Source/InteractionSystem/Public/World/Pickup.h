@@ -19,6 +19,9 @@ public:
 	
 	APickup();
 
+	UPROPERTY(EditAnywhere, Category = "Interaction Interface")
+	bool bCanInteract;
+	
 	void InitializePickup(const TSubclassOf<UItemBase> BaseClass, const int32 InQuantity);
 
 	void InitializeDrop(UItemBase* ItemToDrop, const int32 InQuantity);
@@ -27,7 +30,7 @@ public:
 
 	virtual void BeginFocus() override;
 	virtual void EndFocus() override;
-	
+	virtual bool CanInteract() override;
 protected:
 
 	UPROPERTY(VisibleAnywhere, Category = "Pickup | Components")
@@ -50,10 +53,10 @@ protected:
 	
 	virtual void BeginPlay() override;
 	
-	virtual void Interact(AInteractionSystemCharacter* PlayerCharacter) override;
+	virtual void Interact(ADSCharacter* PlayerCharacter) override;
 	void UpdateInteractableData();
 	
-	void TakePickup(const AInteractionSystemCharacter* Taker);
+	void TakePickup(const ADSCharacter* Taker);
 
 #if WITH_EDITOR
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;

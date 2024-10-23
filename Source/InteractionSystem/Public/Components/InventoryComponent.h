@@ -80,8 +80,8 @@ public:
 	UFUNCTION(Category = "Inventory")
 	UItemBase* FindNextItemByID(UItemBase* ItemIn) const;
 
-	UFUNCTION(Category = "Inventory")
-	UItemBase* FindNextPartialStack(UItemBase* ItemIn) const;
+	//UFUNCTION(Category = "Inventory")
+	//UItemBase* FindNextPartialStack(UItemBase* ItemIn) const;
 	
 	UFUNCTION(Category = "Inventory")
 	FItemAddResult HandleAddItem(UItemBase* InputItem);
@@ -92,8 +92,8 @@ public:
 	UFUNCTION(Category = "Inventory")
 	int32 RemoveAmountOfItem(UItemBase* ItemIn, int32 DesiredAmountToRemove);
 	
-	UFUNCTION(Category = "Inventory")
-	void SplitExistingStack(UItemBase* ItemIn, const int32 AmountToSplit);
+	//UFUNCTION(Category = "Inventory")
+	//void SplitExistingStack(UItemBase* ItemIn, const int32 AmountToSplit);
 
 	UFUNCTION(Category = "Inventory")
 	FORCEINLINE float GetInventoryTotalWeight() const { return InventoryTotalWeight;};
@@ -128,10 +128,10 @@ protected:
 	
 	virtual void BeginPlay() override;
 
-	FItemAddResult HandleNonStackableItems(UItemBase* InputItem);
+	//FItemAddResult HandleNonStackableItems(UItemBase* InputItem);
 	int32 HandleStackableItems(UItemBase* InputItem, int32 RequestedAddAmount);
-	int32 CalculateWeightAddAmount(UItemBase* ItemIn, int32 RequestedAddAmount);
-	int32 CalculateNumberForFullStack(UItemBase* StackableItem, int32 InitialRequestedAddAmount);
+	//int32 CalculateWeightAddAmount(UItemBase* ItemIn, int32 RequestedAddAmount);
+	//int32 CalculateNumberForFullStack(UItemBase* StackableItem, int32 InitialRequestedAddAmount);
 
 	void AddNewItem(UItemBase* Item, const int32 AmountToAdd);
 };

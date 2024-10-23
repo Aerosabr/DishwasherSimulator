@@ -22,6 +22,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
 	TSubclassOf<UInteractionWidget> InteractionWidgetClass;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
+	TSubclassOf<UUserWidget> CrosshairClass;
+	
 	bool bIsMenuVisible;
 
 	AInteractionHUD();
@@ -38,8 +41,11 @@ protected:
 	UPROPERTY()
 	UMainMenu* MainMenuWidget;
 
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere, Category = "Interaction Widget")
 	UInteractionWidget* InteractionWidget;
+
+	UPROPERTY()
+	UUserWidget* CrosshairWidget;
 
 	virtual void BeginPlay() override;
 };
