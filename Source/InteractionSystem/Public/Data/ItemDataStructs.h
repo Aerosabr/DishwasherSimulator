@@ -18,7 +18,8 @@ UENUM()
 enum class EItemType : uint8
 {
 	Soap UMETA(DisplayName = "Soap"),
-	Faucet UMETA(DisplayName = "Faucet")
+	Faucet UMETA(DisplayName = "Faucet"),
+	Plate UMETA(DisplayName = "Plate"),
 };
 
 USTRUCT()

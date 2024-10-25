@@ -1,22 +1,22 @@
 #include "World/Appliance/Sink.h"
-#include "Items/ItemBase.h"
 
 ASink::ASink()
 {
 	PrimaryActorTick.bCanEverTick = true;
-
-	WaterMesh = CreateDefaultSubobject<UStaticMeshComponent>("WaterMesh");
-	SetRootComponent(WaterMesh);
 	
 	SinkMesh = CreateDefaultSubobject<UStaticMeshComponent>("SinkMesh");
 	SetRootComponent(SinkMesh);
+	
+	WaterMesh = CreateDefaultSubobject<UStaticMeshComponent>("WaterMesh");
 }
 
 void ASink::BeginPlay()
 {
 	Super::BeginPlay();
-
+	
 	InteractableData = InstanceInteractableData;
+	WaterState = EWaterState::Dirty;
+	SetWaterMesh();
 }
 
 void ASink::Tick(float DeltaTime)
@@ -39,22 +39,46 @@ void ASink::EndFocus()
 
 void ASink::BeginInteract()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Calling BeginInteract override on interface test actor."));
+
 }
 
 void ASink::EndInteract()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Calling EndInteract override on interface test actor."));
+
 }
 
 void ASink::Interact(ADSCharacter* PlayerCharacter)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Calling nteract override on interface test actor."));
+	UE_LOG(LogTemp, Warning, TEXT("Interacting with Sink"));
+	SetWaterMesh();
 }
 
 bool ASink::CanInteract()
 {
 	return bCanInteract;
+}
+
+void ASink::SetWaterMesh()
+{
+	switch (WaterState)
+	{
+		case EWaterState::Default:
+			WaterState = EWaterState::Soap;
+			SinkMesh->SetMaterial(0, Materials[0]);
+			break;
+		case EWaterState::Soap:
+			WaterState = EWaterState::Dirty;
+			SinkMesh->SetMaterial(0, Materials[1]);
+			break;
+		case EWaterState::Dirty:
+			WaterState = EWaterState::Default;
+			SinkMesh->SetMaterial(0, Materials[2]);
+			break;
+		default:
+			WaterState = EWaterState::Default;
+			SinkMesh->SetMaterial(0, Materials[2]);
+			break;
+	}
 }
 
 

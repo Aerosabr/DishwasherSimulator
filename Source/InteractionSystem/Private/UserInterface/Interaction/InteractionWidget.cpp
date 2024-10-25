@@ -13,7 +13,7 @@ void UInteractionWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	KeyPressText->SetText(FText::FromString("Press"));
+	//KeyPressText->SetText(FText::FromString("Press"));
 	CurrentInteractionDuration = 0.0f;
 }
 
@@ -22,7 +22,8 @@ void UInteractionWidget::UpdateWidget(const FInteractableData* InteractableData)
 	switch (InteractableData->InteractableType)
 	{
 		case EInteractableType::Pickup:
-			KeyPressText->SetText(FText::FromString("Press"));
+			KeyPressText->SetText(InteractableData->Name);
+			//KeyPressText->SetText(FText::FromString("Press"));
 			InteractionProgressBar->SetVisibility(ESlateVisibility::Collapsed);
 
 			if (InteractableData->Quantity < 2)
@@ -31,8 +32,8 @@ void UInteractionWidget::UpdateWidget(const FInteractableData* InteractableData)
 			}
 			else
 			{
-				QuantityText->SetText(FText::Format(NSLOCTEXT("InteractionWidget", "QuantityText", "x{0}"), InteractableData->Quantity));
-				QuantityText->SetVisibility(ESlateVisibility::Visible);
+				//QuantityText->SetText(FText::Format(NSLOCTEXT("InteractionWidget", "QuantityText", "x{0}"), InteractableData->Quantity));
+				//QuantityText->SetVisibility(ESlateVisibility::Visible);
 			}
 			break;
 		case EInteractableType::NonPlayerCharacter:
@@ -51,8 +52,8 @@ void UInteractionWidget::UpdateWidget(const FInteractableData* InteractableData)
 	default: ;
 	}
 
-	ActionText->SetText(InteractableData->Action);
-	NameText->SetText(InteractableData->Name);
+	//ActionText->SetText(InteractableData->Action);
+	//NameText->SetText(InteractableData->Name);
 }
 
 float UInteractionWidget::UpdateInteractionProgress()

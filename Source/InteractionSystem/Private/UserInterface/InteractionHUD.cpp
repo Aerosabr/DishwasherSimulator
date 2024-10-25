@@ -71,7 +71,6 @@ void AInteractionHUD::ShowInteractionWidget() const
 {
 	if (InteractionWidget)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Show"))
 		InteractionWidget->SetVisibility(ESlateVisibility::Visible);
 	}
 }
@@ -80,7 +79,6 @@ void AInteractionHUD::HideInteractionWidget() const
 {
 	if (InteractionWidget)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Hide"))
 		InteractionWidget->SetVisibility(ESlateVisibility::Collapsed);
 	}
 }
@@ -90,10 +88,7 @@ void AInteractionHUD::UpdateInteractionWidget(const FInteractableData* Interacta
 	if (InteractionWidget)
 	{
 		if (InteractionWidget->GetVisibility() == ESlateVisibility::Collapsed)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Show2"))
 			InteractionWidget->SetVisibility(ESlateVisibility::Visible);
-		}
 
 		InteractionWidget->UpdateWidget(InteractableData);
 	}

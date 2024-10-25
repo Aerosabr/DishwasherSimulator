@@ -1,10 +1,6 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
-
 #include "DSCharacter.h"
-#include "InteractionSystemProjectile.h"
 #include "Animation/AnimInstance.h"
 #include "Camera/CameraComponent.h"
-#include "DSCharacter.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "EnhancedInputComponent.h"
@@ -13,10 +9,9 @@
 #include "Engine/LocalPlayer.h"
 #include "Engine/World.h"
 #include "DrawDebugHelpers.h"
-#include "Merge.h"
 #include "Components/InventoryComponent.h"
 #include "UserInterface/InteractionHUD.h"
-
+#include "WorldPartition/ContentBundle/ContentBundleLog.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -48,6 +43,51 @@ ADSCharacter::ADSCharacter()
 	InteractionCheckDistance = 250.0f;
 
 	BaseEyeHeight = 56.0f;
+
+	bIsHoldingItem = false;
+}
+
+void ADSCharacter::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	if (GetWorld()->TimeSince(InteractionData.LastInteractionCheckTime) > InteractionCheckFrequency)
+		PerformInteractionCheck();
+}
+
+void ADSCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+	
+	HUD = Cast<AInteractionHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
+}
+
+void ADSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+{	
+	// Set up action bindings
+	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent))
+	{
+		// Jumping
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
+
+		// Toggle Menu
+		EnhancedInputComponent->BindAction(ToggleMenuAction, ETriggerEvent::Started, this, &ADSCharacter::ToggleMenu);
+		
+		// Interact
+		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &ADSCharacter::Interact);
+		//EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Completed, this, &ADSCharacter::EndInteract);
+		
+		// Moving
+		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ADSCharacter::Move);
+
+		// Looking
+		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ADSCharacter::Look);
+	}
+	else
+	{
+		UE_LOG(LogTemplateCharacter, Error, TEXT("'%s' Failed to find an Enhanced Input Component! This template is built to use the Enhanced Input system. If you intend to use the legacy system, then you will need to update this C++ file."), *GetNameSafe(this));
+	}
 }
 
 void ADSCharacter::PerformInteractionCheck()
@@ -86,8 +126,10 @@ void ADSCharacter::PerformInteractionCheck()
 
 void ADSCharacter::FoundInteractable(AActor* NewInteractable)
 {
+	/*
 	if (IsInteracting())
 		EndInteract();
+	*/
 	
 	if (InteractionData.CurrentInteractable)
 	{
@@ -106,16 +148,12 @@ void ADSCharacter::FoundInteractable(AActor* NewInteractable)
 void ADSCharacter::NoInteractableFound()
 {
 	if (IsInteracting())
-	{
 		GetWorldTimerManager().ClearTimer(TimerHandle_Interaction);
-	}
 
 	if (InteractionData.CurrentInteractable)
 	{
 		if (IsValid(TargetInteractable.GetObject()))
-		{
 			TargetInteractable->EndFocus();
-		}
 
 		HUD->HideInteractionWidget();
 
@@ -124,6 +162,7 @@ void ADSCharacter::NoInteractableFound()
 	}
 }
 
+/*
 void ADSCharacter::BeginInteract()
 {
 	PerformInteractionCheck();
@@ -135,9 +174,7 @@ void ADSCharacter::BeginInteract()
 			TargetInteractable->BeginInteract();
 
 			if (FMath::IsNearlyZero(TargetInteractable->InteractableData.InteractionDuration, 0.1f))
-			{
 				Interact();
-			}
 			else
 			{
 				GetWorldTimerManager().SetTimer(TimerHandle_Interaction,
@@ -155,74 +192,48 @@ void ADSCharacter::EndInteract()
 	GetWorldTimerManager().ClearTimer(TimerHandle_Interaction);
 
 	if (IsValid(TargetInteractable.GetObject()))
-	{
 		TargetInteractable->EndInteract();
-	}
 }
+*/
 
 void ADSCharacter::Interact()
 {
-	GetWorldTimerManager().ClearTimer(TimerHandle_Interaction);
-
-	if (IsValid(TargetInteractable.GetObject()))
+	PerformInteractionCheck();
+	
+	if (InteractionData.CurrentInteractable)
 	{
-		TargetInteractable->Interact(this);
+		if (IsValid(TargetInteractable.GetObject()))
+		{
+			TargetInteractable->BeginInteract();
+
+			if (FMath::IsNearlyZero(TargetInteractable->InteractableData.InteractionDuration, 0.1f))
+			{
+				GetWorldTimerManager().ClearTimer(TimerHandle_Interaction);
+				if (IsValid(TargetInteractable.GetObject()))
+					TargetInteractable->Interact(this);
+			}
+			else
+			{
+				GetWorldTimerManager().SetTimer(TimerHandle_Interaction,
+					this,
+					&ADSCharacter::Interact,
+					TargetInteractable->InteractableData.InteractionDuration,
+					false);
+			}
+		}
 	}
+}
+
+void ADSCharacter::SetIsHoldingItem(bool toggle)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Setting item"));
+	bIsHoldingItem = toggle;
 }
 
 void ADSCharacter::UpdateInteractionWidget() const
 {
 	if (IsValid(TargetInteractable.GetObject()))
-	{
 		HUD->UpdateInteractionWidget(&TargetInteractable->InteractableData);
-	}
-}
-
-void ADSCharacter::Tick(float DeltaSeconds)
-{
-	Super::Tick(DeltaSeconds);
-
-	if (GetWorld()->TimeSince(InteractionData.LastInteractionCheckTime) > InteractionCheckFrequency)
-		PerformInteractionCheck();
-}
-
-void ADSCharacter::BeginPlay()
-{
-	// Call the base class  
-	Super::BeginPlay();
-	
-	HUD = Cast<AInteractionHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
-	
-}
-
-//////////////////////////////////////////////////////////////////////////// Input
-
-void ADSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{	
-	// Set up action bindings
-	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent))
-	{
-		// Jumping
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
-
-		// Toggle Menu
-		EnhancedInputComponent->BindAction(ToggleMenuAction, ETriggerEvent::Started, this, &ADSCharacter::ToggleMenu);
-		
-		// Interact
-		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &ADSCharacter::BeginInteract);
-		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Completed, this, &ADSCharacter::EndInteract);
-		
-		// Moving
-		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ADSCharacter::Move);
-
-		// Looking
-		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ADSCharacter::Look);
-	}
-	else
-	{
-		UE_LOG(LogTemplateCharacter, Error, TEXT("'%s' Failed to find an Enhanced Input Component! This template is built to use the Enhanced Input system. If you intend to use the legacy system, then you will need to update this C++ file."), *GetNameSafe(this));
-	}
 }
 
 void ADSCharacter::ToggleMenu()
@@ -232,12 +243,10 @@ void ADSCharacter::ToggleMenu()
 
 void ADSCharacter::Move(const FInputActionValue& Value)
 {
-	// input is a Vector2D
 	FVector2D MovementVector = Value.Get<FVector2D>();
 
 	if (Controller != nullptr)
 	{
-		// add movement 
 		AddMovementInput(GetActorForwardVector(), MovementVector.Y);
 		AddMovementInput(GetActorRightVector(), MovementVector.X);
 	}
@@ -245,12 +254,10 @@ void ADSCharacter::Move(const FInputActionValue& Value)
 
 void ADSCharacter::Look(const FInputActionValue& Value)
 {
-	// input is a Vector2D
 	FVector2D LookAxisVector = Value.Get<FVector2D>();
 
 	if (Controller != nullptr)
 	{
-		// add yaw and pitch input to controller
 		AddControllerYawInput(LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
 	}

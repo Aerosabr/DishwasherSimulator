@@ -41,42 +41,39 @@ UCLASS(config=Game)
 class ADSCharacter : public ACharacter
 {
 	GENERATED_BODY()
-
-	/** Pawn mesh: 1st person view (arms; seen only by self) */
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Mesh, meta = (AllowPrivateAccess = "true"))
 	USkeletalMeshComponent* Mesh1P;
-
-	/** First person camera */
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* FirstPersonCameraComponent;
-
-	/** Jump Input Action */
+	
+#pragma region Inputs
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
 	UInputAction* JumpAction;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
 	UInputAction* MoveAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* LookAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* InteractAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* ToggleMenuAction;
+#pragma endregion
 	
 public:
 	ADSCharacter();
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputAction* LookAction;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputAction* InteractAction;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputAction* ToggleMenuAction;
-	
 	USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
-
 	UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
-
 	FORCEINLINE bool IsInteracting() const { return GetWorldTimerManager().IsTimerActive((TimerHandle_Interaction));};
-
 	FORCEINLINE UInventoryComponent* GetInventory() const { return PlayerInventory; };
-
+	FORCEINLINE bool GetIsHoldingItem() const { return bIsHoldingItem; };
+	void SetIsHoldingItem(bool toggle);
 	void UpdateInteractionWidget() const;
 	
 protected:
@@ -93,6 +90,9 @@ protected:
 	float InteractionCheckFrequency;
 	float InteractionCheckDistance;
 
+	UPROPERTY(VisibleAnywhere, Category = "Holding Item")
+	bool bIsHoldingItem;
+	
 	FTimerHandle TimerHandle_Interaction;
 
 	FInteractionData InteractionData;
@@ -100,8 +100,8 @@ protected:
 	void PerformInteractionCheck();
 	void FoundInteractable(AActor* NewInteractable);
 	void NoInteractableFound();
-	void BeginInteract();
-	void EndInteract();
+	//void BeginInteract();
+	//void EndInteract();
 	void Interact();
 
 	virtual void Tick(float DeltaSeconds) override;

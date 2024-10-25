@@ -32,7 +32,7 @@ public:
 	virtual void EndFocus() override;
 	virtual bool CanInteract() override;
 protected:
-
+	
 	UPROPERTY(VisibleAnywhere, Category = "Pickup | Components")
 	UStaticMeshComponent* PickupMesh;
 
