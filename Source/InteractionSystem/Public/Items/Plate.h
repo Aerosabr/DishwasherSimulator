@@ -3,17 +3,20 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Interfaces/InteractionInterface.h"
+#include "Interfaces/Pickup.h"
 #include "Plate.generated.h"
 
+enum class EDishState : uint8;
+
 UCLASS()
-class INTERACTIONSYSTEM_API APlate : public AActor,  public IInteractionInterface
+class INTERACTIONSYSTEM_API APlate : public AActor,  public IInteractionInterface, public IPickup
 {
 	GENERATED_BODY()
 	
 public:	
 	APlate();
 	
-	UPROPERTY(EditInstanceOnly, Category = "Test Actor")
+	UPROPERTY(EditInstanceOnly, Category = "Plate")
 	FInteractableData InstanceInteractableData;
 	
 	virtual void BeginPlay() override;
@@ -25,12 +28,16 @@ public:
 	virtual void EndInteract() override;
 	virtual void Interact(ADSCharacter* PlayerCharacter) override;
 	virtual bool CanInteract() override;
-
+	virtual void DropItem(ADSCharacter* PlayerCharacter) override;
+	
 protected:
 	
-	UPROPERTY(EditAnywhere, Category = "Interaction Interface")
+	UPROPERTY(EditAnywhere, Category = "Plate")
 	bool bCanInteract;
+
+	UPROPERTY(VisibleAnywhere, Category = "Plate")
+	EDishState DishState;
 	
-	UPROPERTY(EditAnywhere, Category = "Mesh | Plate")
+	UPROPERTY(EditAnywhere, Category = "Plate")
 	UStaticMeshComponent* PlateMesh;
 };

@@ -20,7 +20,7 @@ class INTERACTIONSYSTEM_API ASanitizer : public AActor,  public IInteractionInte
 public:	
 	ASanitizer();
 	
-	UPROPERTY(EditInstanceOnly, Category = "Sanitizer | Interact Info")
+	UPROPERTY(EditInstanceOnly, Category = "Sanitizer")
 	FInteractableData InstanceInteractableData;
 	
 	virtual void BeginPlay() override;
@@ -34,16 +34,16 @@ public:
 	virtual bool CanInteract() override;
 
 protected:
-	UPROPERTY(VisibleAnywhere, Category = "Sanitizer | Water State")
+	UPROPERTY(VisibleAnywhere, Category = "Sanitizer")
 	ESanitizerState SanitizerState;
 	
-	UPROPERTY(EditAnywhere, Category = "Sanitizer | Interaction Interface")
+	UPROPERTY(EditAnywhere, Category = "Sanitizer")
 	bool bCanInteract;
 
-	UPROPERTY(EditAnywhere, Category = "Sanitizer | Mesh")
+	UPROPERTY(EditAnywhere, Category = "Sanitizer")
 	TArray<UMaterialInterface*> Materials;
 	
-	UPROPERTY(EditAnywhere, Category = "Sanitizer | Mesh")
+	UPROPERTY(EditAnywhere, Category = "Sanitizer")
 	UStaticMeshComponent* SanitizerMesh;
 
 	void SetWaterMesh();

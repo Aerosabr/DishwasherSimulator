@@ -5,6 +5,16 @@
 #include "ItemDataStructs.generated.h"
 
 UENUM()
+enum class EDishState : uint8
+{
+	Dirty UMETA(DisplayName = "Dirty"),
+	Scraped UMETA(DisplayName = "Scraped"),
+	Washed UMETA(DisplayName = "Washed"),
+	Rinsed UMETA(DisplayName = "Rinsed"),
+	Sanitized UMETA(DisplayName = "Sanitized"),
+};
+
+UENUM()
 enum class EItemQuality : uint8
 {
 	Common UMETA(DisplayName = "Common"),
@@ -17,9 +27,12 @@ enum class EItemQuality : uint8
 UENUM()
 enum class EItemType : uint8
 {
+	None UMETA(DisplayName = "None"),
 	Soap UMETA(DisplayName = "Soap"),
+	Sanitizer UMETA(DisplayName = "Sanitizer"),
 	Faucet UMETA(DisplayName = "Faucet"),
 	Plate UMETA(DisplayName = "Plate"),
+	Dish UMETA(DisplayName = "Dish")
 };
 
 USTRUCT()

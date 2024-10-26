@@ -13,7 +13,7 @@ class INTERACTIONSYSTEM_API ARinser : public AActor,  public IInteractionInterfa
 public:	
 	ARinser();
 	
-	UPROPERTY(EditInstanceOnly, Category = "Rinser | Interact Info")
+	UPROPERTY(EditInstanceOnly, Category = "Rinser")
 	FInteractableData InstanceInteractableData;
 	
 	virtual void BeginPlay() override;
@@ -28,10 +28,10 @@ public:
 
 protected:
 	
-	UPROPERTY(EditAnywhere, Category = "Rinser | Interaction Interface")
+	UPROPERTY(EditAnywhere, Category = "Rinser")
 	bool bCanInteract;
 	
-	UPROPERTY(EditAnywhere, Category = "Rinser | Mesh")
+	UPROPERTY(EditAnywhere, Category = "Rinser")
 	UStaticMeshComponent* RinserMesh;
 	
 };

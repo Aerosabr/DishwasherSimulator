@@ -10,6 +10,8 @@
 #include "Engine/World.h"
 #include "DrawDebugHelpers.h"
 #include "Components/InventoryComponent.h"
+#include "Data/ItemDataStructs.h"
+#include "Interfaces/Pickup.h"
 #include "UserInterface/InteractionHUD.h"
 #include "WorldPartition/ContentBundle/ContentBundleLog.h"
 
@@ -60,6 +62,7 @@ void ADSCharacter::BeginPlay()
 	Super::BeginPlay();
 	
 	HUD = Cast<AInteractionHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
+	ItemHeldType = EItemType::None;
 }
 
 void ADSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -77,6 +80,9 @@ void ADSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 		// Interact
 		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &ADSCharacter::Interact);
 		//EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Completed, this, &ADSCharacter::EndInteract);
+
+		// Drop
+		EnhancedInputComponent->BindAction(DropAction, ETriggerEvent::Started, this, &ADSCharacter::DropHeldItem);
 		
 		// Moving
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ADSCharacter::Move);
@@ -224,9 +230,27 @@ void ADSCharacter::Interact()
 	}
 }
 
-void ADSCharacter::SetIsHoldingItem(bool toggle)
+void ADSCharacter::DropHeldItem()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Setting item"));
+	if (bIsHoldingItem)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Drop"));
+		if (IPickup* ItemBeingHeld = Cast<IPickup>(HeldItem))
+		{
+			ItemBeingHeld->DropItem(this);
+			HeldItem = nullptr;
+			SetIsHoldingItem(false, EItemType::None);
+		}
+	}
+}
+
+void ADSCharacter::SetIsHoldingItem(bool toggle, EItemType itemType)
+{
+	if (toggle)
+		ItemHeldType = itemType;
+	else
+		ItemHeldType = EItemType::None;
+
 	bIsHoldingItem = toggle;
 }
 

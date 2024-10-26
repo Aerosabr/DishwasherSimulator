@@ -1,5 +1,3 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -9,6 +7,7 @@
 #include "Logging/LogMacros.h"
 #include "DSCharacter.generated.h"
 
+enum class EItemType : uint8;
 class UInventoryComponent;
 class AInteractionHUD;
 class UInputComponent;
@@ -49,15 +48,18 @@ class ADSCharacter : public ACharacter
 	UCameraComponent* FirstPersonCameraComponent;
 	
 #pragma region Inputs
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* JumpAction;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* MoveAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* LookAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* DropAction;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* InteractAction;
 
@@ -66,6 +68,9 @@ class ADSCharacter : public ACharacter
 #pragma endregion
 	
 public:
+	UPROPERTY(VisibleAnywhere, Category = "Character")
+	AActor* HeldItem;
+	
 	ADSCharacter();
 	
 	USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
@@ -73,7 +78,8 @@ public:
 	FORCEINLINE bool IsInteracting() const { return GetWorldTimerManager().IsTimerActive((TimerHandle_Interaction));};
 	FORCEINLINE UInventoryComponent* GetInventory() const { return PlayerInventory; };
 	FORCEINLINE bool GetIsHoldingItem() const { return bIsHoldingItem; };
-	void SetIsHoldingItem(bool toggle);
+	FORCEINLINE EItemType GetHeldItemType() const { return ItemHeldType; };
+	void SetIsHoldingItem(bool toggle, EItemType itemType);
 	void UpdateInteractionWidget() const;
 	
 protected:
@@ -86,6 +92,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, Category = "Character | Inventory")
 	UInventoryComponent* PlayerInventory;
+
+	UPROPERTY(VisibleAnywhere, Category = "Character")
+	EItemType ItemHeldType;
 	
 	float InteractionCheckFrequency;
 	float InteractionCheckDistance;
@@ -103,7 +112,8 @@ protected:
 	//void BeginInteract();
 	//void EndInteract();
 	void Interact();
-
+	void DropHeldItem();
+	
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void BeginPlay() override;
 
