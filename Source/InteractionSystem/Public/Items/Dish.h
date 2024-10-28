@@ -4,17 +4,17 @@
 #include "GameFramework/Actor.h"
 #include "Interfaces/InteractionInterface.h"
 #include "Interfaces/Pickup.h"
-#include "Plate.generated.h"
+#include "Dish.generated.h"
 
 enum class EDishState : uint8;
 
 UCLASS()
-class INTERACTIONSYSTEM_API APlate : public AActor,  public IInteractionInterface, public IPickup
+class INTERACTIONSYSTEM_API ADish : public AActor,  public IInteractionInterface, public IPickup
 {
 	GENERATED_BODY()
 	
 public:	
-	APlate();
+	ADish();
 	
 	UPROPERTY(EditInstanceOnly, Category = "Plate")
 	FInteractableData InstanceInteractableData;
@@ -29,6 +29,9 @@ public:
 	virtual void Interact(ADSCharacter* PlayerCharacter) override;
 	virtual bool CanInteract() override;
 	virtual void DropItem(ADSCharacter* PlayerCharacter) override;
+	FORCEINLINE EDishState GetDishState() const { return DishState; };
+	void ProgressDishState();
+	void SetDishMesh();
 	
 protected:
 	
@@ -39,5 +42,13 @@ protected:
 	EDishState DishState;
 	
 	UPROPERTY(EditAnywhere, Category = "Plate")
-	UStaticMeshComponent* PlateMesh;
+	UStaticMeshComponent* DishMesh;
+
+	UPROPERTY(EditAnywhere, Category = "Plate")
+	TArray<UStaticMesh*> DishMeshes;
+	
+	UPROPERTY(EditInstanceOnly, Category = "Plate")
+	FDataTableRowHandle ItemRowHandle;
+	
+	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 };

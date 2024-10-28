@@ -47,6 +47,10 @@ ADSCharacter::ADSCharacter()
 	BaseEyeHeight = 56.0f;
 
 	bIsHoldingItem = false;
+
+	RotationCenter = FVector(0.f, 0.f, 0.f);
+	CumulativeDistance = 0.f;
+	DistanceThreshold = 1000.f;
 }
 
 void ADSCharacter::Tick(float DeltaSeconds)
@@ -55,6 +59,9 @@ void ADSCharacter::Tick(float DeltaSeconds)
 
 	if (GetWorld()->TimeSince(InteractionData.LastInteractionCheckTime) > InteractionCheckFrequency)
 		PerformInteractionCheck();
+
+	//FVector MousePosition = GetCurrentMousePosition();
+	//CalculateDistance(MousePosition);
 }
 
 void ADSCharacter::BeginPlay()
@@ -63,6 +70,8 @@ void ADSCharacter::BeginPlay()
 	
 	HUD = Cast<AInteractionHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
 	ItemHeldType = EItemType::None;
+	
+	LastMousePosition = FVector::ZeroVector;
 }
 
 void ADSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -286,3 +295,43 @@ void ADSCharacter::Look(const FInputActionValue& Value)
 		AddControllerPitchInput(LookAxisVector.Y);
 	}
 }
+
+void ADSCharacter::CalculateDistance(FVector MousePosition)
+{
+	if (LastMousePosition.IsZero())
+	{
+		LastMousePosition = MousePosition;
+		return;
+	}
+
+	float DistanceMoved = FVector::Dist(MousePosition, LastMousePosition);
+	CumulativeDistance += DistanceMoved;
+	UE_LOG(LogTemp, Log, TEXT("Distance Threshold Reached! Total Distance: %f"), DistanceMoved);
+	if (CumulativeDistance >= DistanceThreshold)
+	{
+		//UE_LOG(LogTemp, Log, TEXT("Distance Threshold Reached! Total Distance: %f"), CumulativeDistance);
+		CumulativeDistance = 0.f;
+	}
+
+	LastMousePosition = MousePosition;
+}
+
+FVector ADSCharacter::GetCurrentMousePosition()
+{
+	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+	if (PlayerController)
+	{
+		float ScreenX, ScreenY;
+		PlayerController->GetMousePosition(ScreenX, ScreenY);
+
+		FVector WorldLocation, WorldDirection;
+		if (PlayerController->DeprojectScreenPositionToWorld(ScreenX, ScreenY, WorldLocation, WorldDirection))
+		{
+			FVector MousePositionInWorld = WorldLocation + WorldDirection * 1000.f;
+			return MousePositionInWorld;
+		}
+	}
+
+	return FVector::ZeroVector;
+}
+

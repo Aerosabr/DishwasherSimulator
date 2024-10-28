@@ -5,6 +5,8 @@
 #include "Interfaces/InteractionInterface.h"
 #include "Sanitizer.generated.h"
 
+class ADish;
+
 UENUM()
 enum class ESanitizerState : uint8
 {
@@ -47,4 +49,5 @@ protected:
 	UStaticMeshComponent* SanitizerMesh;
 
 	void SetWaterMesh();
+	void InteractedWithDish(ADish* Dish);
 };

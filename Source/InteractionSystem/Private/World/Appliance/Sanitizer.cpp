@@ -1,4 +1,8 @@
 #include "World/Appliance/Sanitizer.h"
+#include "Data/ItemDataStructs.h"
+#include "InteractionSystem/DSCharacter.h"
+#include "Items/Dish.h"
+
 
 ASanitizer::ASanitizer()
 {
@@ -48,7 +52,29 @@ void ASanitizer::EndInteract()
 void ASanitizer::Interact(ADSCharacter* PlayerCharacter)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Interacting with Sanitizer"));
-	SetWaterMesh();
+	switch(PlayerCharacter->GetHeldItemType())
+	{
+		case EItemType::None:
+			SetWaterMesh();
+			break;
+		case EItemType::Dish:
+			
+			
+			break;
+		case EItemType::Soap:
+			
+			break;
+		case EItemType::Sanitizer:
+			
+			break;
+		case EItemType::Faucet:
+			
+			break;
+		case EItemType::Plate:
+			
+			break;
+	}
+	
 }
 
 bool ASanitizer::CanInteract()
@@ -70,3 +96,16 @@ void ASanitizer::SetWaterMesh()
 		break;
 	}
 }
+
+void ASanitizer::InteractedWithDish(ADish* Dish)
+{
+	switch (Dish->GetDishState())
+	{
+		case EDishState::Dirty:
+			Dish->ProgressDishState();
+			break;
+		default:
+			return;
+	}
+}
+

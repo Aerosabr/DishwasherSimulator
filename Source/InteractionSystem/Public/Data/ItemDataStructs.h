@@ -81,12 +81,9 @@ USTRUCT()
 struct FItemAssetData
 {
 	GENERATED_USTRUCT_BODY()
-	
-	UPROPERTY(EditAnywhere)
-	UTexture2D* Icon;
 
 	UPROPERTY(EditAnywhere)
-	UStaticMesh* Mesh;
+	TArray<UStaticMesh*> Mesh;
 };
 
 USTRUCT()

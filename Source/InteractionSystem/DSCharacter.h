@@ -124,5 +124,12 @@ protected:
 	
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
 
+
+	FVector RotationCenter;
+	float CumulativeDistance;
+	float DistanceThreshold;
+	void CalculateDistance(FVector MousePosition);
+	FVector GetCurrentMousePosition();
+	FVector LastMousePosition;
 };
 

@@ -1,18 +1,18 @@
-#include "Items/Plate.h"
+#include "Items/Dish.h"
 
 #include "Data/ItemDataStructs.h"
 #include "InteractionSystem/DSCharacter.h"
 
-APlate::APlate()
+ADish::ADish()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	PlateMesh = CreateDefaultSubobject<UStaticMeshComponent>("PickupMesh");
-	PlateMesh->SetSimulatePhysics(true);
-	SetRootComponent(PlateMesh);
+	DishMesh = CreateDefaultSubobject<UStaticMeshComponent>("PickupMesh");
+	DishMesh->SetSimulatePhysics(true);
+	SetRootComponent(DishMesh);
 }
 
-void APlate::BeginPlay()
+void ADish::BeginPlay()
 {
 	Super::BeginPlay();
 	InteractableData = InstanceInteractableData;
@@ -20,35 +20,35 @@ void APlate::BeginPlay()
 	Cast<UPrimitiveComponent>(GetComponentByClass(UPrimitiveComponent::StaticClass()))->SetSimulatePhysics(false);
 }
 
-void APlate::Tick(float DeltaTime)
+void ADish::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
 }
 
-void APlate::BeginFocus()
+void ADish::BeginFocus()
 {
-	if (PlateMesh)
-		PlateMesh->SetRenderCustomDepth(true);
+	if (DishMesh)
+		DishMesh->SetRenderCustomDepth(true);
 }
 
-void APlate::EndFocus()
+void ADish::EndFocus()
 {
-	if (PlateMesh)
-		PlateMesh->SetRenderCustomDepth(false);
+	if (DishMesh)
+		DishMesh->SetRenderCustomDepth(false);
 }
 
-void APlate::BeginInteract()
+void ADish::BeginInteract()
 {
 	IInteractionInterface::BeginInteract();
 }
 
-void APlate::EndInteract()
+void ADish::EndInteract()
 {
 	IInteractionInterface::EndInteract();
 }
 
-void APlate::Interact(ADSCharacter* PlayerCharacter)
+void ADish::Interact(ADSCharacter* PlayerCharacter)
 {
 	if (PlayerCharacter)
 	{
@@ -56,7 +56,7 @@ void APlate::Interact(ADSCharacter* PlayerCharacter)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("NOT HOLDING ITEM"));
 			Cast<UPrimitiveComponent>(GetComponentByClass(UPrimitiveComponent::StaticClass()))->SetSimulatePhysics(false);
-			PlateMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			DishMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 			AttachToComponent(PlayerCharacter->GetMesh1P(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("AttachSocket"));
 			PlayerCharacter->SetIsHoldingItem(true, EItemType::Dish);
 			PlayerCharacter->HeldItem = this;
@@ -66,12 +66,12 @@ void APlate::Interact(ADSCharacter* PlayerCharacter)
 	}
 }
 
-bool APlate::CanInteract()
+bool ADish::CanInteract()
 {
 	return bCanInteract;
 }
 
-void APlate::DropItem(ADSCharacter* PlayerCharacter)
+void ADish::DropItem(ADSCharacter* PlayerCharacter)
 {
 	// Detach the item from the player
 	DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
@@ -113,7 +113,73 @@ void APlate::DropItem(ADSCharacter* PlayerCharacter)
 
 	// Enable collision on the item
 	Cast<UPrimitiveComponent>(GetComponentByClass(UPrimitiveComponent::StaticClass()))->SetSimulatePhysics(true);
-	PlateMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	DishMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+}
+
+void ADish::ProgressDishState()
+{
+	switch (DishState)
+	{
+		case EDishState::Dirty:
+			DishState = EDishState::Scraped;
+			SetDishMesh();
+			break;
+		case EDishState::Scraped:
+			
+			break;
+		case EDishState::Washed:
+			
+			break;
+		case EDishState::Rinsed:
+			
+			break;
+		case EDishState::Sanitized:
+			
+			break;
+	}
+}
+
+void ADish::SetDishMesh()
+{
+	switch (DishState)
+	{
+	case EDishState::Dirty:
+		DishMesh->SetStaticMesh(DishMeshes[0]);
+		break;
+	case EDishState::Scraped:
+		DishMesh->SetStaticMesh(DishMeshes[1]);
+		break;
+	case EDishState::Washed:
+		DishMesh->SetStaticMesh(DishMeshes[2]);
+		break;
+	case EDishState::Rinsed:
+		DishMesh->SetStaticMesh(DishMeshes[3]);
+		break;
+	case EDishState::Sanitized:
+		DishMesh->SetStaticMesh(DishMeshes[4]);
+		break;
+	default:
+		DishMesh->SetStaticMesh(DishMeshes[0]);
+		break;
+	}
+}
+
+void ADish::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+{
+	Super::PostEditChangeProperty(PropertyChangedEvent);
+
+	const FName ChangedPropertyName = PropertyChangedEvent.Property ? PropertyChangedEvent.Property->GetFName() : NAME_None;
+
+	if (ChangedPropertyName == GET_MEMBER_NAME_CHECKED(FDataTableRowHandle, RowName))
+	{
+		if (!ItemRowHandle.IsNull())
+		{
+			UE_LOG(LogTemp, Log, TEXT("PostEdit"));
+			const FItemData* ItemData = ItemRowHandle.GetRow<FItemData>(ItemRowHandle.RowName.ToString());
+			DishMeshes = ItemData->AssetData.Mesh;
+			SetDishMesh();
+		}
+	}
 }
 
 

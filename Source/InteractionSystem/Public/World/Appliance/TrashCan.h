@@ -5,6 +5,8 @@
 #include "Interfaces/InteractionInterface.h"
 #include "TrashCan.generated.h"
 
+class ADish;
+
 UCLASS()
 class INTERACTIONSYSTEM_API ATrashCan : public AActor,  public IInteractionInterface
 {
@@ -33,5 +35,6 @@ protected:
 	
 	UPROPERTY(EditAnywhere, Category = "TrashCan | Mesh")
 	UStaticMeshComponent* TrashCanMesh;
-	
+
+	static void InteractedWithDish(const ADSCharacter* PlayerCharacter);
 };
