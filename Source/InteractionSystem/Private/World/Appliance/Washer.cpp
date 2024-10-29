@@ -1,5 +1,9 @@
 #include "World/Appliance/Washer.h"
 
+#include "Data/ItemDataStructs.h"
+#include "InteractionSystem/DSCharacter.h"
+#include "Items/Dish.h"
+
 AWasher::AWasher()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -48,7 +52,27 @@ void AWasher::EndInteract()
 void AWasher::Interact(ADSCharacter* PlayerCharacter)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Interacting with Washer"));
-	SetWaterMesh();
+	switch(PlayerCharacter->GetHeldItemType())
+	{
+		case EItemType::None:
+			
+			break;
+		case EItemType::Dish:
+			InteractedWithDish(PlayerCharacter);
+			break;
+		case EItemType::Soap:
+				
+			break;
+		case EItemType::Sanitizer:
+				
+			break;
+		case EItemType::Faucet:
+				
+			break;
+		case EItemType::Plate:
+				
+			break;
+	}
 }
 
 bool AWasher::CanInteract()
@@ -73,4 +97,11 @@ void AWasher::SetWaterMesh()
 		WasherMesh->SetMaterial(0, Materials[2]);
 		break;
 	}
+}
+
+void AWasher::InteractedWithDish(const ADSCharacter* PlayerCharacter)
+{
+	UE_LOG(LogTemp, Log, TEXT("interact"));
+	if (ADish* Dish = Cast<ADish>(PlayerCharacter->HeldItem); Dish->GetDishState() == EDishState::Scraped)
+		Dish->ProgressDishState();
 }

@@ -83,7 +83,7 @@ struct FItemAssetData
 	GENERATED_USTRUCT_BODY()
 
 	UPROPERTY(EditAnywhere)
-	TArray<UStaticMesh*> Mesh;
+	TArray<UStaticMesh*> Meshes;
 };
 
 USTRUCT()

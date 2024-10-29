@@ -58,20 +58,19 @@ void ASanitizer::Interact(ADSCharacter* PlayerCharacter)
 			SetWaterMesh();
 			break;
 		case EItemType::Dish:
-			
-			
+			InteractedWithDish(PlayerCharacter);
 			break;
 		case EItemType::Soap:
-			
+					
 			break;
 		case EItemType::Sanitizer:
-			
+					
 			break;
 		case EItemType::Faucet:
-			
+					
 			break;
 		case EItemType::Plate:
-			
+					
 			break;
 	}
 	
@@ -97,15 +96,10 @@ void ASanitizer::SetWaterMesh()
 	}
 }
 
-void ASanitizer::InteractedWithDish(ADish* Dish)
+void ASanitizer::InteractedWithDish(const ADSCharacter* PlayerCharacter)
 {
-	switch (Dish->GetDishState())
-	{
-		case EDishState::Dirty:
-			Dish->ProgressDishState();
-			break;
-		default:
-			return;
-	}
+	if (ADish* Dish = Cast<ADish>(PlayerCharacter->HeldItem); Dish->GetDishState() == EDishState::Rinsed)
+		Dish->ProgressDishState();
 }
+
 

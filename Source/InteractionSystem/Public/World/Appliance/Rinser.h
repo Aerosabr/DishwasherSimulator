@@ -33,5 +33,6 @@ protected:
 	
 	UPROPERTY(EditAnywhere, Category = "Rinser")
 	UStaticMeshComponent* RinserMesh;
-	
+
+	static void InteractedWithDish(const ADSCharacter* PlayerCharacter);
 };

@@ -1,11 +1,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "NiagaraComponent.h"
 #include "GameFramework/Actor.h"
 #include "Interfaces/InteractionInterface.h"
 #include "Interfaces/Pickup.h"
 #include "Dish.generated.h"
-
+class UNiagaraSystem;
+class UNiagaraComponent;
 enum class EDishState : uint8;
 
 UCLASS()
@@ -46,6 +48,12 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Plate")
 	TArray<UStaticMesh*> DishMeshes;
+
+	UPROPERTY(EditAnywhere, Category = "Plate")
+	TArray<UNiagaraSystem*> Particles;
+
+	UPROPERTY(EditAnywhere, Category = "Plate")
+	UNiagaraComponent* Particle;
 	
 	UPROPERTY(EditInstanceOnly, Category = "Plate")
 	FDataTableRowHandle ItemRowHandle;

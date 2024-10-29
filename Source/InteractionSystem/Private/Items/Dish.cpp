@@ -1,5 +1,6 @@
 #include "Items/Dish.h"
-
+#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
 #include "Data/ItemDataStructs.h"
 #include "InteractionSystem/DSCharacter.h"
 
@@ -10,6 +11,8 @@ ADish::ADish()
 	DishMesh = CreateDefaultSubobject<UStaticMeshComponent>("PickupMesh");
 	DishMesh->SetSimulatePhysics(true);
 	SetRootComponent(DishMesh);
+	Particle = CreateDefaultSubobject<UNiagaraComponent>(TEXT("NiagaraParticleComponent"));
+	RootComponent = Particle;
 }
 
 void ADish::BeginPlay()
@@ -23,7 +26,11 @@ void ADish::BeginPlay()
 void ADish::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	if (Particle && RootComponent)
+	{
+		Particle->SetWorldLocation(RootComponent->GetComponentLocation()); // Set location to match RootComponent
+		Particle->SetWorldRotation(RootComponent->GetComponentRotation()); // Set rotation to match RootComponent
+	}
 }
 
 void ADish::BeginFocus()
@@ -125,13 +132,24 @@ void ADish::ProgressDishState()
 			SetDishMesh();
 			break;
 		case EDishState::Scraped:
-			
+			DishState = EDishState::Washed;
+			SetDishMesh();
+			Particle->SetAsset(Particles[0]); 
+			Particle->RegisterComponent(); 
+			Particle->Activate();
+			Particle->SetVisibility(true);
 			break;
 		case EDishState::Washed:
-			
+			DishState = EDishState::Rinsed;
+			SetDishMesh();
+			Particle->Deactivate();
 			break;
 		case EDishState::Rinsed:
-			
+			DishState = EDishState::Sanitized;
+			SetDishMesh();
+			Particle->SetAsset(Particles[1]); 
+			Particle->RegisterComponent(); 
+			Particle->Activate();
 			break;
 		case EDishState::Sanitized:
 			
@@ -151,6 +169,7 @@ void ADish::SetDishMesh()
 		break;
 	case EDishState::Washed:
 		DishMesh->SetStaticMesh(DishMeshes[2]);
+		
 		break;
 	case EDishState::Rinsed:
 		DishMesh->SetStaticMesh(DishMeshes[3]);
@@ -162,6 +181,7 @@ void ADish::SetDishMesh()
 		DishMesh->SetStaticMesh(DishMeshes[0]);
 		break;
 	}
+	
 }
 
 void ADish::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
@@ -176,7 +196,7 @@ void ADish::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 		{
 			UE_LOG(LogTemp, Log, TEXT("PostEdit"));
 			const FItemData* ItemData = ItemRowHandle.GetRow<FItemData>(ItemRowHandle.RowName.ToString());
-			DishMeshes = ItemData->AssetData.Mesh;
+			DishMeshes = ItemData->AssetData.Meshes;
 			SetDishMesh();
 		}
 	}

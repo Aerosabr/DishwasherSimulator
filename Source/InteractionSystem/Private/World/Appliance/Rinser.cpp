@@ -1,5 +1,9 @@
 #include "World/Appliance/Rinser.h"
 
+#include "Data/ItemDataStructs.h"
+#include "InteractionSystem/DSCharacter.h"
+#include "Items/Dish.h"
+
 ARinser::ARinser()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -46,9 +50,37 @@ void ARinser::EndInteract()
 void ARinser::Interact(ADSCharacter* PlayerCharacter)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Interacting with Rinser"));
+	switch(PlayerCharacter->GetHeldItemType())
+	{
+		case EItemType::None:
+			
+			break;
+		case EItemType::Dish:
+			InteractedWithDish(PlayerCharacter);
+			break;
+		case EItemType::Soap:
+					
+			break;
+		case EItemType::Sanitizer:
+					
+			break;
+		case EItemType::Faucet:
+					
+			break;
+		case EItemType::Plate:
+					
+			break;
+	}
 }
 
 bool ARinser::CanInteract()
 {
 	return bCanInteract;
+}
+
+void ARinser::InteractedWithDish(const ADSCharacter* PlayerCharacter)
+{
+	UE_LOG(LogTemp, Log, TEXT("interact"));
+	if (ADish* Dish = Cast<ADish>(PlayerCharacter->HeldItem); Dish->GetDishState() == EDishState::Washed)
+		Dish->ProgressDishState();
 }

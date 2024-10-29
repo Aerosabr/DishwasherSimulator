@@ -49,5 +49,5 @@ protected:
 	UStaticMeshComponent* SanitizerMesh;
 
 	void SetWaterMesh();
-	void InteractedWithDish(ADish* Dish);
+	static void InteractedWithDish(const ADSCharacter* PlayerCharacter);
 };

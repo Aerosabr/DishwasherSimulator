@@ -49,5 +49,7 @@ protected:
 	UStaticMeshComponent* WasherMesh;
 
 	void SetWaterMesh();
+
+	static void InteractedWithDish(const ADSCharacter* PlayerCharacter);
 };
 
