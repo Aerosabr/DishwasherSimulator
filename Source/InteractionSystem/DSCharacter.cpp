@@ -50,7 +50,7 @@ ADSCharacter::ADSCharacter()
 
 	RotationCenter = FVector(0.f, 0.f, 0.f);
 	CumulativeDistance = 0.f;
-	DistanceThreshold = 1000.f;
+	DistanceThreshold = 0.f;
 }
 
 void ADSCharacter::Tick(float DeltaSeconds)
@@ -60,8 +60,11 @@ void ADSCharacter::Tick(float DeltaSeconds)
 	if (GetWorld()->TimeSince(InteractionData.LastInteractionCheckTime) > InteractionCheckFrequency)
 		PerformInteractionCheck();
 
-	//FVector MousePosition = GetCurrentMousePosition();
-	//CalculateDistance(MousePosition);
+	if (bIsScrubbing)
+	{
+		FVector MousePosition = GetCurrentMousePosition();
+		CalculateDistance(MousePosition);
+	}
 }
 
 void ADSCharacter::BeginPlay()
@@ -296,6 +299,28 @@ void ADSCharacter::Look(const FInputActionValue& Value)
 	}
 }
 
+void ADSCharacter::StartScrubbing(float threshold)
+{
+	if (!bIsScrubbing)
+	{
+		if (APlayerController* PlayerController = GetWorld()->GetFirstPlayerController())
+		{
+			FInputModeGameAndUI InputMode;
+
+			
+			PlayerController->SetInputMode(InputMode);
+			PlayerController->bShowMouseCursor = true;
+
+			FVector2D ViewportSize;
+			GetWorld()->GetGameViewport()->GetViewportSize(ViewportSize);
+			PlayerController->SetMouseLocation(ViewportSize.X / 2, ViewportSize.Y / 2);
+		}
+		bIsScrubbing = true;
+		DistanceThreshold = threshold;
+		CumulativeDistance = 0.0f;
+	}
+}
+
 void ADSCharacter::CalculateDistance(FVector MousePosition)
 {
 	if (LastMousePosition.IsZero())
@@ -306,11 +331,19 @@ void ADSCharacter::CalculateDistance(FVector MousePosition)
 
 	float DistanceMoved = FVector::Dist(MousePosition, LastMousePosition);
 	CumulativeDistance += DistanceMoved;
-	UE_LOG(LogTemp, Log, TEXT("Distance Threshold Reached! Total Distance: %f"), DistanceMoved);
 	if (CumulativeDistance >= DistanceThreshold)
 	{
-		//UE_LOG(LogTemp, Log, TEXT("Distance Threshold Reached! Total Distance: %f"), CumulativeDistance);
+		UE_LOG(LogTemp, Log, TEXT("Distance Threshold Reached! Total Distance: %f"), CumulativeDistance);
 		CumulativeDistance = 0.f;
+
+		bIsScrubbing = false;
+		if (APlayerController* PlayerController = GetWorld()->GetFirstPlayerController())
+		{
+			FInputModeGameOnly InputMode;
+			
+			PlayerController->SetInputMode(InputMode);
+			PlayerController->bShowMouseCursor = false;
+		}
 	}
 
 	LastMousePosition = MousePosition;

@@ -55,7 +55,7 @@ void AWasher::Interact(ADSCharacter* PlayerCharacter)
 	switch(PlayerCharacter->GetHeldItemType())
 	{
 		case EItemType::None:
-			
+			PlayerCharacter->StartScrubbing(1000.0f);
 			break;
 		case EItemType::Dish:
 			InteractedWithDish(PlayerCharacter);

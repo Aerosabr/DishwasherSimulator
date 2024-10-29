@@ -81,7 +81,8 @@ public:
 	FORCEINLINE EItemType GetHeldItemType() const { return ItemHeldType; };
 	void SetIsHoldingItem(bool toggle, EItemType itemType);
 	void UpdateInteractionWidget() const;
-	
+
+	void StartScrubbing(float threshold);
 protected:
 
 	UPROPERTY()
@@ -106,11 +107,16 @@ protected:
 
 	FInteractionData InteractionData;
 
+	// Scrubbing variables
+	bool bIsScrubbing;
+	FVector LastMousePosition;
+	FVector RotationCenter;
+	float CumulativeDistance;
+	float DistanceThreshold;
+	
 	void PerformInteractionCheck();
 	void FoundInteractable(AActor* NewInteractable);
 	void NoInteractableFound();
-	//void BeginInteract();
-	//void EndInteract();
 	void Interact();
 	void DropHeldItem();
 	
@@ -124,12 +130,9 @@ protected:
 	
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
 
-
-	FVector RotationCenter;
-	float CumulativeDistance;
-	float DistanceThreshold;
+	// Scrubbing functions
 	void CalculateDistance(FVector MousePosition);
 	FVector GetCurrentMousePosition();
-	FVector LastMousePosition;
+	
 };
 
