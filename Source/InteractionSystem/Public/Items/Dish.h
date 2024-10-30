@@ -26,8 +26,6 @@ public:
 	
 	virtual void BeginFocus() override;
 	virtual void EndFocus() override;
-	virtual void BeginInteract() override;
-	virtual void EndInteract() override;
 	virtual void Interact(ADSCharacter* PlayerCharacter) override;
 	virtual bool CanInteract() override;
 	virtual void DropItem(ADSCharacter* PlayerCharacter) override;
@@ -55,7 +53,7 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Plate")
 	UNiagaraComponent* Particle;
 	
-	UPROPERTY(EditInstanceOnly, Category = "Plate")
+	UPROPERTY(EditAnywhere, Category = "Plate")
 	FDataTableRowHandle ItemRowHandle;
 	
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;

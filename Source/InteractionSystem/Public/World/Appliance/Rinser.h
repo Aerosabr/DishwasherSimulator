@@ -5,6 +5,8 @@
 #include "Interfaces/InteractionInterface.h"
 #include "Rinser.generated.h"
 
+class ADish;
+
 UCLASS()
 class INTERACTIONSYSTEM_API ARinser : public AActor,  public IInteractionInterface
 {
@@ -13,7 +15,7 @@ class INTERACTIONSYSTEM_API ARinser : public AActor,  public IInteractionInterfa
 public:	
 	ARinser();
 	
-	UPROPERTY(EditInstanceOnly, Category = "Rinser")
+	UPROPERTY(EditInstanceOnly, Category = "Rinser", meta = (DisplayPriority = 0))
 	FInteractableData InstanceInteractableData;
 	
 	virtual void BeginPlay() override;
@@ -21,18 +23,32 @@ public:
 	
 	virtual void BeginFocus() override;
 	virtual void EndFocus() override;
-	virtual void BeginInteract() override;
-	virtual void EndInteract() override;
 	virtual void Interact(ADSCharacter* PlayerCharacter) override;
 	virtual bool CanInteract() override;
 
 protected:
 	
-	UPROPERTY(EditAnywhere, Category = "Rinser")
+	UPROPERTY(EditAnywhere, Category = "Rinser", meta = (DisplayPriority = 0))
 	bool bCanInteract;
 	
-	UPROPERTY(EditAnywhere, Category = "Rinser")
+	UPROPERTY(EditAnywhere, Category = "Rinser", meta = (DisplayPriority = 0))
 	UStaticMeshComponent* RinserMesh;
 
-	static void InteractedWithDish(const ADSCharacter* PlayerCharacter);
+	// Scrubbing variables
+	UPROPERTY(EditAnywhere, Category = "Rinser", meta = (DisplayPriority = 0))
+	bool bIsScrubbing;
+
+	UPROPERTY(EditAnywhere, Category = "Rinser", meta = (DisplayPriority = 0))
+	ADSCharacter* Player;
+	FVector LastMousePosition;
+	FVector RotationCenter;
+	float CumulativeDistance;
+	float DistanceThreshold;
+	
+	// Scrubbing functions
+	void StartRinsing();
+	void CalculateDistance(FVector MousePosition);
+	FVector GetCurrentMousePosition();
+	
+	void InteractedWithDish(ADSCharacter* PlayerCharacter);
 };

@@ -12,14 +12,6 @@ void IInteractionInterface::EndFocus()
 {
 }
 
-void IInteractionInterface::BeginInteract()
-{
-}
-
-void IInteractionInterface::EndInteract()
-{
-}
-
 void IInteractionInterface::Interact(ADSCharacter* PlayerCharacter)
 {
 }

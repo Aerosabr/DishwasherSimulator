@@ -23,18 +23,32 @@ public:
 	
 	virtual void BeginFocus() override;
 	virtual void EndFocus() override;
-	virtual void BeginInteract() override;
-	virtual void EndInteract() override;
 	virtual void Interact(ADSCharacter* PlayerCharacter) override;
 	virtual bool CanInteract() override;
 
 protected:
 	
-	UPROPERTY(EditAnywhere, Category = "TrashCan | Interaction Interface")
+	UPROPERTY(EditAnywhere, Category = "TrashCan", meta = (DisplayPriority = 0))
 	bool bCanInteract;
 	
-	UPROPERTY(EditAnywhere, Category = "TrashCan | Mesh")
+	UPROPERTY(EditAnywhere, Category = "TrashCan", meta = (DisplayPriority = 0))
 	UStaticMeshComponent* TrashCanMesh;
 
-	static void InteractedWithDish(const ADSCharacter* PlayerCharacter);
+	// Scrubbing variables
+	UPROPERTY(EditAnywhere, Category = "TrashCan", meta = (DisplayPriority = 0))
+	bool bIsScrubbing;
+
+	UPROPERTY(EditAnywhere, Category = "TrashCan", meta = (DisplayPriority = 0))
+	ADSCharacter* Player;
+	FVector LastMousePosition;
+	FVector RotationCenter;
+	float CumulativeDistance;
+	float DistanceThreshold;
+	
+	// Scrubbing functions
+	void StartScraping();
+	void CalculateDistance(FVector MousePosition);
+	FVector GetCurrentMousePosition();
+	
+	void InteractedWithDish(ADSCharacter* PlayerCharacter);
 };

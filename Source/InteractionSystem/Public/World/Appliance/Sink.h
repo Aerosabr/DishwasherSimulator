@@ -29,8 +29,6 @@ public:
 	
 	virtual void BeginFocus() override;
 	virtual void EndFocus() override;
-	virtual void BeginInteract() override;
-	virtual void EndInteract() override;
 	virtual void Interact(ADSCharacter* PlayerCharacter) override;
 	virtual bool CanInteract() override;
 

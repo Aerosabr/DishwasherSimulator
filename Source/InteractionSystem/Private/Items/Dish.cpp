@@ -12,7 +12,7 @@ ADish::ADish()
 	DishMesh->SetSimulatePhysics(true);
 	SetRootComponent(DishMesh);
 	Particle = CreateDefaultSubobject<UNiagaraComponent>(TEXT("NiagaraParticleComponent"));
-	RootComponent = Particle;
+
 }
 
 void ADish::BeginPlay()
@@ -20,7 +20,7 @@ void ADish::BeginPlay()
 	Super::BeginPlay();
 	InteractableData = InstanceInteractableData;
 	DishState = EDishState::Dirty;
-	Cast<UPrimitiveComponent>(GetComponentByClass(UPrimitiveComponent::StaticClass()))->SetSimulatePhysics(false);
+	//Cast<UPrimitiveComponent>(GetComponentByClass(UPrimitiveComponent::StaticClass()))->SetSimulatePhysics(false);
 }
 
 void ADish::Tick(float DeltaTime)
@@ -43,16 +43,6 @@ void ADish::EndFocus()
 {
 	if (DishMesh)
 		DishMesh->SetRenderCustomDepth(false);
-}
-
-void ADish::BeginInteract()
-{
-	IInteractionInterface::BeginInteract();
-}
-
-void ADish::EndInteract()
-{
-	IInteractionInterface::EndInteract();
 }
 
 void ADish::Interact(ADSCharacter* PlayerCharacter)
@@ -80,29 +70,22 @@ bool ADish::CanInteract()
 
 void ADish::DropItem(ADSCharacter* PlayerCharacter)
 {
-	// Detach the item from the player
 	DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
-
-	// Get the player's viewpoint location and rotation
+	
 	FVector ViewLocation;
 	FRotator ViewRotation;
 	if (PlayerCharacter->GetController())
-	{
 		PlayerCharacter->GetController()->GetPlayerViewPoint(ViewLocation, ViewRotation);
-	}
-
-	// Set the end point for the line trace based on view direction
-	FVector EndLocation = ViewLocation + (ViewRotation.Vector() * 500.0f); // Adjust 500 as needed for distance
+	
+	FVector EndLocation = ViewLocation + (ViewRotation.Vector() * 500.0f); 
 
 	FHitResult HitResult;
 	FCollisionQueryParams QueryParams;
-	QueryParams.AddIgnoredActor(this); // Ignore the item itself
-	QueryParams.AddIgnoredActor(PlayerCharacter); // Ignore the player character
-
-	// Perform the line trace
+	QueryParams.AddIgnoredActor(this); 
+	QueryParams.AddIgnoredActor(PlayerCharacter); 
+	
 	if (GetWorld()->LineTraceSingleByChannel(HitResult, ViewLocation, EndLocation, ECC_Visibility, QueryParams))
 	{
-		// If we hit something, use that location
 		const FVector SpawnLocation = HitResult.Location;
 		const FTransform SpawnTransform(PlayerCharacter->GetActorRotation(), SpawnLocation);
 
@@ -110,15 +93,13 @@ void ADish::DropItem(ADSCharacter* PlayerCharacter)
 	}
 	else
 	{
-		// If nothing was hit, fall back to dropping the item at the player’s feet
 		const FVector FeetLocation = PlayerCharacter->GetActorLocation() - FVector(0, 0, PlayerCharacter->GetMesh()->GetComponentLocation().Z);
 		const FVector SpawnLocation = FeetLocation + (PlayerCharacter->GetActorForwardVector() * 50.0f);
 		const FTransform SpawnTransform(PlayerCharacter->GetActorRotation(), SpawnLocation);
 
 		SetActorTransform(SpawnTransform);
 	}
-
-	// Enable collision on the item
+	
 	Cast<UPrimitiveComponent>(GetComponentByClass(UPrimitiveComponent::StaticClass()))->SetSimulatePhysics(true);
 	DishMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 }

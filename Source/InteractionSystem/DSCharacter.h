@@ -81,38 +81,34 @@ public:
 	FORCEINLINE EItemType GetHeldItemType() const { return ItemHeldType; };
 	void SetIsHoldingItem(bool toggle, EItemType itemType);
 	void UpdateInteractionWidget() const;
+	void ToggleMovement(bool toggle);
 
-	void StartScrubbing(float threshold);
 protected:
 
 	UPROPERTY()
 	AInteractionHUD* HUD;
 	
-	UPROPERTY(VisibleAnywhere, Category = "Character | Interaction")
+	UPROPERTY(VisibleAnywhere, Category = "Character", meta = (DisplayPriority = 0))
 	TScriptInterface<IInteractionInterface> TargetInteractable;
 
-	UPROPERTY(VisibleAnywhere, Category = "Character | Inventory")
+	UPROPERTY(VisibleAnywhere, Category = "Character", meta = (DisplayPriority = 0))
 	UInventoryComponent* PlayerInventory;
 
-	UPROPERTY(VisibleAnywhere, Category = "Character")
+	UPROPERTY(VisibleAnywhere, Category = "Character", meta = (DisplayPriority = 0))
 	EItemType ItemHeldType;
 	
 	float InteractionCheckFrequency;
 	float InteractionCheckDistance;
 
-	UPROPERTY(VisibleAnywhere, Category = "Holding Item")
+	UPROPERTY(VisibleAnywhere, Category = "Character", meta = (DisplayPriority = 0))
 	bool bIsHoldingItem;
+
+	UPROPERTY(VisibleAnywhere, Category = "Character", meta = (DisplayPriority = 0))
+	bool bCanMove;
 	
 	FTimerHandle TimerHandle_Interaction;
 
 	FInteractionData InteractionData;
-
-	// Scrubbing variables
-	bool bIsScrubbing;
-	FVector LastMousePosition;
-	FVector RotationCenter;
-	float CumulativeDistance;
-	float DistanceThreshold;
 	
 	void PerformInteractionCheck();
 	void FoundInteractable(AActor* NewInteractable);
@@ -129,10 +125,6 @@ protected:
 	void Look(const FInputActionValue& Value);
 	
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
-
-	// Scrubbing functions
-	void CalculateDistance(FVector MousePosition);
-	FVector GetCurrentMousePosition();
 	
 };
 

@@ -3,28 +3,42 @@
 #include "InteractionSystem/DSCharacter.h"
 #include "Items/Dish.h"
 
-
 ASanitizer::ASanitizer()
 {
 	PrimaryActorTick.bCanEverTick = true;
 	
 	SanitizerMesh = CreateDefaultSubobject<UStaticMeshComponent>("SanitizerMesh");
 	SetRootComponent(SanitizerMesh);
+
+	// Scrubbing variables
+	bIsScrubbing = false;
+	RotationCenter = FVector(0.f, 0.f, 0.f);
+	CumulativeDistance = 0.f;
+	DistanceThreshold = 0.f;
 }
 
 void ASanitizer::BeginPlay()
 {
 	Super::BeginPlay();
+
+	LastMousePosition = FVector::ZeroVector;
 	
 	InteractableData = InstanceInteractableData;
 	SanitizerState = ESanitizerState::Sanitized;
 	SetWaterMesh();
+	
+	Player = Cast<ADSCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn());
 }
 
 void ASanitizer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (bIsScrubbing)
+	{
+		FVector MousePosition = GetCurrentMousePosition();
+		CalculateDistance(MousePosition);
+	}
 }
 
 void ASanitizer::BeginFocus()
@@ -37,16 +51,6 @@ void ASanitizer::EndFocus()
 {
 	if (SanitizerMesh)
 		SanitizerMesh->SetRenderCustomDepth(false);
-}
-
-void ASanitizer::BeginInteract()
-{
-
-}
-
-void ASanitizer::EndInteract()
-{
-
 }
 
 void ASanitizer::Interact(ADSCharacter* PlayerCharacter)
@@ -81,6 +85,77 @@ bool ASanitizer::CanInteract()
 	return bCanInteract;
 }
 
+void ASanitizer::StartSanitizing()
+{
+	if (!bIsScrubbing)
+	{
+		if (APlayerController* PlayerController = GetWorld()->GetFirstPlayerController())
+		{
+
+			FInputModeUIOnly InputMode;
+			
+			PlayerController->SetInputMode(InputMode);
+			PlayerController->bShowMouseCursor = true;
+
+			FVector2D ViewportSize;
+			GetWorld()->GetGameViewport()->GetViewportSize(ViewportSize);
+			PlayerController->SetMouseLocation(ViewportSize.X / 2, ViewportSize.Y / 2);
+		}
+		bIsScrubbing = true;
+		DistanceThreshold = 4000.0f;
+		CumulativeDistance = 0.0f;
+	}
+}
+
+void ASanitizer::CalculateDistance(FVector MousePosition)
+{
+	if (LastMousePosition.IsZero())
+	{
+		LastMousePosition = MousePosition;
+		return;
+	}
+
+	float DistanceMoved = FVector::Dist(MousePosition, LastMousePosition);
+	CumulativeDistance += DistanceMoved;
+	if (CumulativeDistance >= DistanceThreshold)
+	{
+		UE_LOG(LogTemp, Log, TEXT("Distance Threshold Reached! Total Distance: %f"), CumulativeDistance);
+		CumulativeDistance = 0.f;
+
+		bIsScrubbing = false;
+		if (APlayerController* PlayerController = GetWorld()->GetFirstPlayerController())
+		{
+			PlayerController->SetInputMode(FInputModeGameOnly());
+			PlayerController->bShowMouseCursor = false;
+		}
+
+		Cast<ADish>(Player->HeldItem)->ProgressDishState();
+		Player->ToggleMovement(true);
+		FSlateApplication::Get().ClearKeyboardFocus(EFocusCause::Cleared);
+	}
+
+	LastMousePosition = MousePosition;
+}
+
+FVector ASanitizer::GetCurrentMousePosition()
+{
+	if (APlayerController* PlayerController = GetWorld()->GetFirstPlayerController())
+	{
+		float ScreenX, ScreenY;
+		PlayerController->GetMousePosition(ScreenX, ScreenY);
+
+		FVector WorldLocation, WorldDirection;
+		if (PlayerController->DeprojectScreenPositionToWorld(ScreenX, ScreenY, WorldLocation, WorldDirection))
+		{
+			FVector MousePositionInWorld = WorldLocation + WorldDirection * 1000.f;
+			return MousePositionInWorld;
+		}
+	}
+
+	return FVector::ZeroVector;
+}
+
+
 void ASanitizer::SetWaterMesh()
 {
 	switch (SanitizerState)
@@ -96,10 +171,13 @@ void ASanitizer::SetWaterMesh()
 	}
 }
 
-void ASanitizer::InteractedWithDish(const ADSCharacter* PlayerCharacter)
+void ASanitizer::InteractedWithDish(ADSCharacter* PlayerCharacter)
 {
-	if (ADish* Dish = Cast<ADish>(PlayerCharacter->HeldItem); Dish->GetDishState() == EDishState::Rinsed)
-		Dish->ProgressDishState();
+	if (ADish* TempDish = Cast<ADish>(PlayerCharacter->HeldItem); TempDish->GetDishState() == EDishState::Rinsed)
+	{
+		PlayerCharacter->ToggleMovement(false);
+		StartSanitizing();
+	}
 }
 
 

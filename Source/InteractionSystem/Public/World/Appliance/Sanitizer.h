@@ -30,24 +30,38 @@ public:
 	
 	virtual void BeginFocus() override;
 	virtual void EndFocus() override;
-	virtual void BeginInteract() override;
-	virtual void EndInteract() override;
 	virtual void Interact(ADSCharacter* PlayerCharacter) override;
 	virtual bool CanInteract() override;
 
 protected:
-	UPROPERTY(VisibleAnywhere, Category = "Sanitizer")
+	UPROPERTY(VisibleAnywhere, Category = "Sanitizer", meta = (DisplayPriority = 0))
 	ESanitizerState SanitizerState;
 	
-	UPROPERTY(EditAnywhere, Category = "Sanitizer")
+	UPROPERTY(EditAnywhere, Category = "Sanitizer", meta = (DisplayPriority = 0))
 	bool bCanInteract;
 
-	UPROPERTY(EditAnywhere, Category = "Sanitizer")
+	UPROPERTY(EditAnywhere, Category = "Sanitizer", meta = (DisplayPriority = 0))
 	TArray<UMaterialInterface*> Materials;
 	
-	UPROPERTY(EditAnywhere, Category = "Sanitizer")
+	UPROPERTY(EditAnywhere, Category = "Sanitizer", meta = (DisplayPriority = 0))
 	UStaticMeshComponent* SanitizerMesh;
 
+	// Scrubbing variables
+	UPROPERTY(EditAnywhere, Category = "Sanitizer", meta = (DisplayPriority = 0))
+	bool bIsScrubbing;
+	
+	UPROPERTY(EditAnywhere, Category = "Sanitizer", meta = (DisplayPriority = 0))
+	ADSCharacter* Player;
+	FVector LastMousePosition;
+	FVector RotationCenter;
+	float CumulativeDistance;
+	float DistanceThreshold;
+	
+	// Scrubbing functions
+	void StartSanitizing();
+	void CalculateDistance(FVector MousePosition);
+	FVector GetCurrentMousePosition();
+	
 	void SetWaterMesh();
-	static void InteractedWithDish(const ADSCharacter* PlayerCharacter);
+	void InteractedWithDish(ADSCharacter* PlayerCharacter);
 };

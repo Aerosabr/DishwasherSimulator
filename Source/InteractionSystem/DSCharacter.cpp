@@ -41,16 +41,14 @@ ADSCharacter::ADSCharacter()
 	//Mesh1P->SetRelativeRotation(FRotator(0.9f, -19.19f, 5.2f));
 	Mesh1P->SetRelativeLocation(FVector(-30.f, 0.f, -150.f));
 
+	// Raycast for interaction
 	InteractionCheckFrequency = 0.1f;
 	InteractionCheckDistance = 250.0f;
-
 	BaseEyeHeight = 56.0f;
-
+	
+	bCanMove = true;
 	bIsHoldingItem = false;
-
-	RotationCenter = FVector(0.f, 0.f, 0.f);
-	CumulativeDistance = 0.f;
-	DistanceThreshold = 0.f;
+	
 }
 
 void ADSCharacter::Tick(float DeltaSeconds)
@@ -59,12 +57,6 @@ void ADSCharacter::Tick(float DeltaSeconds)
 
 	if (GetWorld()->TimeSince(InteractionData.LastInteractionCheckTime) > InteractionCheckFrequency)
 		PerformInteractionCheck();
-
-	if (bIsScrubbing)
-	{
-		FVector MousePosition = GetCurrentMousePosition();
-		CalculateDistance(MousePosition);
-	}
 }
 
 void ADSCharacter::BeginPlay()
@@ -73,8 +65,6 @@ void ADSCharacter::BeginPlay()
 	
 	HUD = Cast<AInteractionHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
 	ItemHeldType = EItemType::None;
-	
-	LastMousePosition = FVector::ZeroVector;
 }
 
 void ADSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -216,14 +206,13 @@ void ADSCharacter::EndInteract()
 
 void ADSCharacter::Interact()
 {
+	UE_LOG(LogTemp, Warning, TEXT("E pressed"));
 	PerformInteractionCheck();
 	
 	if (InteractionData.CurrentInteractable)
 	{
 		if (IsValid(TargetInteractable.GetObject()))
 		{
-			TargetInteractable->BeginInteract();
-
 			if (FMath::IsNearlyZero(TargetInteractable->InteractableData.InteractionDuration, 0.1f))
 			{
 				GetWorldTimerManager().ClearTimer(TimerHandle_Interaction);
@@ -272,6 +261,14 @@ void ADSCharacter::UpdateInteractionWidget() const
 		HUD->UpdateInteractionWidget(&TargetInteractable->InteractableData);
 }
 
+void ADSCharacter::ToggleMovement(bool toggle)
+{
+	if (toggle && !bCanMove)
+		bCanMove = true;
+	else if (!toggle && bCanMove)
+		bCanMove = false;
+}
+
 void ADSCharacter::ToggleMenu()
 {
 	HUD->ToggleMenu();
@@ -279,6 +276,9 @@ void ADSCharacter::ToggleMenu()
 
 void ADSCharacter::Move(const FInputActionValue& Value)
 {
+	if (!bCanMove)
+		return;
+	
 	FVector2D MovementVector = Value.Get<FVector2D>();
 
 	if (Controller != nullptr)
@@ -290,6 +290,9 @@ void ADSCharacter::Move(const FInputActionValue& Value)
 
 void ADSCharacter::Look(const FInputActionValue& Value)
 {
+	if (!bCanMove)
+		return;
+	
 	FVector2D LookAxisVector = Value.Get<FVector2D>();
 
 	if (Controller != nullptr)
@@ -299,72 +302,4 @@ void ADSCharacter::Look(const FInputActionValue& Value)
 	}
 }
 
-void ADSCharacter::StartScrubbing(float threshold)
-{
-	if (!bIsScrubbing)
-	{
-		if (APlayerController* PlayerController = GetWorld()->GetFirstPlayerController())
-		{
-			FInputModeGameAndUI InputMode;
-
-			
-			PlayerController->SetInputMode(InputMode);
-			PlayerController->bShowMouseCursor = true;
-
-			FVector2D ViewportSize;
-			GetWorld()->GetGameViewport()->GetViewportSize(ViewportSize);
-			PlayerController->SetMouseLocation(ViewportSize.X / 2, ViewportSize.Y / 2);
-		}
-		bIsScrubbing = true;
-		DistanceThreshold = threshold;
-		CumulativeDistance = 0.0f;
-	}
-}
-
-void ADSCharacter::CalculateDistance(FVector MousePosition)
-{
-	if (LastMousePosition.IsZero())
-	{
-		LastMousePosition = MousePosition;
-		return;
-	}
-
-	float DistanceMoved = FVector::Dist(MousePosition, LastMousePosition);
-	CumulativeDistance += DistanceMoved;
-	if (CumulativeDistance >= DistanceThreshold)
-	{
-		UE_LOG(LogTemp, Log, TEXT("Distance Threshold Reached! Total Distance: %f"), CumulativeDistance);
-		CumulativeDistance = 0.f;
-
-		bIsScrubbing = false;
-		if (APlayerController* PlayerController = GetWorld()->GetFirstPlayerController())
-		{
-			FInputModeGameOnly InputMode;
-			
-			PlayerController->SetInputMode(InputMode);
-			PlayerController->bShowMouseCursor = false;
-		}
-	}
-
-	LastMousePosition = MousePosition;
-}
-
-FVector ADSCharacter::GetCurrentMousePosition()
-{
-	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
-	if (PlayerController)
-	{
-		float ScreenX, ScreenY;
-		PlayerController->GetMousePosition(ScreenX, ScreenY);
-
-		FVector WorldLocation, WorldDirection;
-		if (PlayerController->DeprojectScreenPositionToWorld(ScreenX, ScreenY, WorldLocation, WorldDirection))
-		{
-			FVector MousePositionInWorld = WorldLocation + WorldDirection * 1000.f;
-			return MousePositionInWorld;
-		}
-	}
-
-	return FVector::ZeroVector;
-}
 

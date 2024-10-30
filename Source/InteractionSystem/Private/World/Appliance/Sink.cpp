@@ -37,16 +37,6 @@ void ASink::EndFocus()
 		SinkMesh->SetRenderCustomDepth(false);
 }
 
-void ASink::BeginInteract()
-{
-
-}
-
-void ASink::EndInteract()
-{
-
-}
-
 void ASink::Interact(ADSCharacter* PlayerCharacter)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Interacting with Sink"));

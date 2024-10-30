@@ -5,6 +5,8 @@
 #include "Interfaces/InteractionInterface.h"
 #include "Washer.generated.h"
 
+class ADish;
+
 UENUM()
 enum class EWasherState : uint8
 {
@@ -29,27 +31,41 @@ public:
 	
 	virtual void BeginFocus() override;
 	virtual void EndFocus() override;
-	virtual void BeginInteract() override;
-	virtual void EndInteract() override;
 	virtual void Interact(ADSCharacter* PlayerCharacter) override;
 	virtual bool CanInteract() override;
 
 protected:
 	
-	UPROPERTY(VisibleAnywhere, Category = "Washer")
+	UPROPERTY(VisibleAnywhere, Category = "Washer", meta = (DisplayPriority = 0))
 	EWasherState WasherState;
 	
-	UPROPERTY(EditAnywhere, Category = "Washer")
+	UPROPERTY(EditAnywhere, Category = "Washer", meta = (DisplayPriority = 0))
 	bool bCanInteract;
 
-	UPROPERTY(EditAnywhere, Category = "Washer")
+	UPROPERTY(EditAnywhere, Category = "Washer", meta = (DisplayPriority = 0))
 	TArray<UMaterialInterface*> Materials;
 	
-	UPROPERTY(EditAnywhere, Category = "Washer")
+	UPROPERTY(EditAnywhere, Category = "Washer", meta = (DisplayPriority = 0))
 	UStaticMeshComponent* WasherMesh;
 
+	// Scrubbing variables
+	UPROPERTY(EditAnywhere, Category = "Washer", meta = (DisplayPriority = 0))
+	bool bIsScrubbing;
+	
+	UPROPERTY(EditAnywhere, Category = "Washer", meta = (DisplayPriority = 0))
+	ADSCharacter* Player;
+	FVector LastMousePosition;
+	FVector RotationCenter;
+	float CumulativeDistance;
+	float DistanceThreshold;
+	
+	// Scrubbing functions
+	void StartWashing();
+	void CalculateDistance(FVector MousePosition);
+	FVector GetCurrentMousePosition();
+	
 	void SetWaterMesh();
 
-	static void InteractedWithDish(const ADSCharacter* PlayerCharacter);
+	void InteractedWithDish(ADSCharacter* PlayerCharacter);
 };
 
