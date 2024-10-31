@@ -2,6 +2,7 @@
 #include "Data/ItemDataStructs.h"
 #include "InteractionSystem/DSCharacter.h"
 #include "Items/Dish.h"
+#include "Manager/DSManager.h"
 
 ASanitizer::ASanitizer()
 {
@@ -128,7 +129,7 @@ void ASanitizer::CalculateDistance(FVector MousePosition)
 			PlayerController->SetInputMode(FInputModeGameOnly());
 			PlayerController->bShowMouseCursor = false;
 		}
-
+		
 		Cast<ADish>(Player->HeldItem)->ProgressDishState();
 		Player->ToggleMovement(true);
 		FSlateApplication::Get().ClearKeyboardFocus(EFocusCause::Cleared);

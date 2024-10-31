@@ -76,7 +76,6 @@ public:
 	USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
 	UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
 	FORCEINLINE bool IsInteracting() const { return GetWorldTimerManager().IsTimerActive((TimerHandle_Interaction));};
-	FORCEINLINE UInventoryComponent* GetInventory() const { return PlayerInventory; };
 	FORCEINLINE bool GetIsHoldingItem() const { return bIsHoldingItem; };
 	FORCEINLINE EItemType GetHeldItemType() const { return ItemHeldType; };
 	void SetIsHoldingItem(bool toggle, EItemType itemType);
@@ -90,9 +89,6 @@ protected:
 	
 	UPROPERTY(VisibleAnywhere, Category = "Character", meta = (DisplayPriority = 0))
 	TScriptInterface<IInteractionInterface> TargetInteractable;
-
-	UPROPERTY(VisibleAnywhere, Category = "Character", meta = (DisplayPriority = 0))
-	UInventoryComponent* PlayerInventory;
 
 	UPROPERTY(VisibleAnywhere, Category = "Character", meta = (DisplayPriority = 0))
 	EItemType ItemHeldType;

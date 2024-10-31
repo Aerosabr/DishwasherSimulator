@@ -6,6 +6,7 @@
 #include "GameFramework/HUD.h"
 #include "InteractionHUD.generated.h"
 
+class UGameWidget;
 struct FInteractableData;
 class UMainMenu;
 class UInteractionWidget;
@@ -24,6 +25,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
 	TSubclassOf<UUserWidget> CrosshairClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
+	TSubclassOf<UGameWidget> GameWidgetClass; 
 	
 	bool bIsMenuVisible;
 
@@ -37,6 +41,9 @@ public:
 	void HideInteractionWidget() const;
 	void UpdateInteractionWidget(const FInteractableData* InteractableData) const;
 
+	void UpdateGameWidgetMoney(int money) const;
+	void UpdateGameWidgetDay(int day) const;
+	
 protected:
 	UPROPERTY()
 	UMainMenu* MainMenuWidget;
@@ -46,6 +53,9 @@ protected:
 
 	UPROPERTY()
 	UUserWidget* CrosshairWidget;
+
+	UPROPERTY()
+	UGameWidget* GameWidget;
 
 	virtual void BeginPlay() override;
 };

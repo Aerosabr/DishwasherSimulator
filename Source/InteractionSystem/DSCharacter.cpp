@@ -27,10 +27,6 @@ ADSCharacter::ADSCharacter()
 	FirstPersonCameraComponent->SetupAttachment(GetCapsuleComponent());
 	FirstPersonCameraComponent->SetRelativeLocation(FVector(-10.f, 0.f, 60.f)); // Position the camera
 	FirstPersonCameraComponent->bUsePawnControlRotation = true;
-
-	PlayerInventory = CreateDefaultSubobject<UInventoryComponent>(TEXT("PlayerInventory"));
-	PlayerInventory->SetSlotsCapacity(20);
-	PlayerInventory->SetWeightCapacity(50);
 	
 	// Create a mesh component that will be used when being viewed from a '1st person' view (when controlling this pawn)
 	Mesh1P = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("CharacterMesh1P"));
@@ -169,40 +165,6 @@ void ADSCharacter::NoInteractableFound()
 		TargetInteractable = nullptr;
 	}
 }
-
-/*
-void ADSCharacter::BeginInteract()
-{
-	PerformInteractionCheck();
-
-	if (InteractionData.CurrentInteractable)
-	{
-		if (IsValid(TargetInteractable.GetObject()))
-		{
-			TargetInteractable->BeginInteract();
-
-			if (FMath::IsNearlyZero(TargetInteractable->InteractableData.InteractionDuration, 0.1f))
-				Interact();
-			else
-			{
-				GetWorldTimerManager().SetTimer(TimerHandle_Interaction,
-					this,
-					&ADSCharacter::Interact,
-					TargetInteractable->InteractableData.InteractionDuration,
-					false);
-			}
-		}
-	}
-}
-
-void ADSCharacter::EndInteract()
-{
-	GetWorldTimerManager().ClearTimer(TimerHandle_Interaction);
-
-	if (IsValid(TargetInteractable.GetObject()))
-		TargetInteractable->EndInteract();
-}
-*/
 
 void ADSCharacter::Interact()
 {
