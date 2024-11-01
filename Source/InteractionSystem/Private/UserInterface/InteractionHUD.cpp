@@ -1,6 +1,7 @@
 #include "UserInterface/InteractionHUD.h"
 
 #include "Components/TextBlock.h"
+#include "Manager/DSManager.h"
 #include "UserInterface/MainMenu.h"
 #include "UserInterface/Interaction/InteractionWidget.h"
 #include "UserInterface/GameWidget.h"
@@ -103,14 +104,33 @@ void AInteractionHUD::UpdateInteractionWidget(const FInteractableData* Interacta
 	}
 }
 
-void AInteractionHUD::UpdateGameWidgetMoney(int money) const
+void AInteractionHUD::UpdateGameWidgetMoney() const
 {
-	GameWidget->Money->SetText(FText::Format(FText::FromString(TEXT("${0}")), FText::AsNumber(money)));
+	if (UDSManager* GameInstance = Cast<UDSManager>(GetGameInstance()))
+		GameWidget->Money->SetText(FText::Format(FText::FromString(TEXT("${0}")), FText::AsNumber(GameInstance->GetMoney())));
+	
 }
 
-void AInteractionHUD::UpdateGameWidgetDay(int day) const
+void AInteractionHUD::UpdateGameWidgetDay() const
 {
-	GameWidget->Day->SetText(FText::AsNumber(day));
+	if (UDSManager* GameInstance = Cast<UDSManager>(GetGameInstance()))
+		GameWidget->Day->SetText(FText::AsNumber(GameInstance->GetDay()));
+	
 }
 
+void AInteractionHUD::UpdateGameWidgetTime() const
+{
+	if (const UDSManager* GameInstance = Cast<UDSManager>(GetGameInstance()))
+	{
+		const int TotalSeconds = GameInstance->GetTime();
+		int Hours = (TotalSeconds / 3600) % 24;  
+		const int Minutes = (TotalSeconds % 3600) / 60;
+
+		const FString Period = (Hours >= 12) ? TEXT("PM") : TEXT("AM");
+		Hours = Hours % 12;
+		if (Hours == 0) Hours = 12;  
+		
+		GameWidget->Time->SetText(FText::FromString(FString::Printf(TEXT("%02d:%02d %s"), Hours, Minutes, *Period)));
+	}
+}
 

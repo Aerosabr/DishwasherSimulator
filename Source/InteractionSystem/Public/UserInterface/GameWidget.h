@@ -15,6 +15,9 @@ class INTERACTIONSYSTEM_API UGameWidget : public UUserWidget
 public:
 	UPROPERTY(VisibleAnywhere, meta = (BindWidget), Category = "Game Widget")
 	UTextBlock* Day;
+
+	UPROPERTY(VisibleAnywhere, meta = (BindWidget), Category = "Game Widget")
+	UTextBlock* Time;
 	
 	UPROPERTY(VisibleAnywhere, meta = (BindWidget), Category = "Game Widget")
 	UTextBlock* Money;
