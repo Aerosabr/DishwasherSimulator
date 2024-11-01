@@ -20,6 +20,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "DSManager", meta = (DisplayPriority = 0))
 	int Day;
+
+	UPROPERTY(EditAnywhere, Category = "DSManager", meta = (DisplayPriority = 0))
+	int Time;
 	
 	virtual void Init() override;
 };
