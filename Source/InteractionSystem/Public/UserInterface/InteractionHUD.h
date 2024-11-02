@@ -40,10 +40,9 @@ public:
 	void ShowInteractionWidget() const;
 	void HideInteractionWidget() const;
 	void UpdateInteractionWidget(const FInteractableData* InteractableData) const;
-
 	void UpdateGameWidgetMoney() const;
-	void UpdateGameWidgetDay() const;
 	void UpdateGameWidgetTime() const;
+	
 protected:
 	UPROPERTY()
 	UMainMenu* MainMenuWidget;

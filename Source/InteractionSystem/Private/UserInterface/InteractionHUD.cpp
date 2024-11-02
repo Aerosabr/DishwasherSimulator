@@ -111,18 +111,25 @@ void AInteractionHUD::UpdateGameWidgetMoney() const
 	
 }
 
-void AInteractionHUD::UpdateGameWidgetDay() const
-{
-	if (UDSManager* GameInstance = Cast<UDSManager>(GetGameInstance()))
-		GameWidget->Day->SetText(FText::AsNumber(GameInstance->GetDay()));
-	
-}
-
 void AInteractionHUD::UpdateGameWidgetTime() const
 {
 	if (const UDSManager* GameInstance = Cast<UDSManager>(GetGameInstance()))
 	{
 		const int TotalSeconds = GameInstance->GetTime();
+		GameWidget->Day->SetText(FText::Format(FText::FromString("Day {0}"), FText::AsNumber(GameInstance->GetDay())));
+		
+		if (TotalSeconds >= 79200)
+		{
+			GameWidget->Time->SetText(FText::FromString("Closed"));
+			return;
+		}
+
+		if (TotalSeconds == 0)
+		{
+			GameWidget->Time->SetText(FText::FromString("Setup"));
+			return;
+		}
+		
 		int Hours = (TotalSeconds / 3600) % 24;  
 		const int Minutes = (TotalSeconds % 3600) / 60;
 

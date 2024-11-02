@@ -15,16 +15,16 @@ public:
 
 	UPROPERTY(EditInstanceOnly, Category = "StartBell", meta = (DisplayPriority = 0))
 	FInteractableData InstanceInteractableData;
-
+	
+	UPROPERTY(EditAnywhere, Category = "StartBell", meta = (DisplayPriority = 0))
+	bool bCanInteract;
+	
 	virtual void BeginFocus() override;
 	virtual void EndFocus() override;
 	virtual void Interact(ADSCharacter* PlayerCharacter) override;
 	virtual bool CanInteract() override;
 	
 protected:
-
-	UPROPERTY(EditAnywhere, Category = "StartBell", meta = (DisplayPriority = 0))
-	bool bCanInteract;
 	
 	UPROPERTY(EditAnywhere, Category = "StartBell", meta = (DisplayPriority = 0))
 	UStaticMeshComponent* BellMesh;

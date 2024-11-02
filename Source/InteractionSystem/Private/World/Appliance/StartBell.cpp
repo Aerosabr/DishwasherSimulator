@@ -15,7 +15,9 @@ AStartBell::AStartBell()
 void AStartBell::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	if (UDSManager* GameInstance = Cast<UDSManager>(GetGameInstance()))
+		GameInstance->SetBell(this);
 }
 
 void AStartBell::Tick(float DeltaTime)
@@ -39,7 +41,7 @@ void AStartBell::EndFocus()
 void AStartBell::Interact(ADSCharacter* PlayerCharacter)
 {
 	if (UDSManager* GameInstance = Cast<UDSManager>(GetGameInstance()))
-		GameInstance->ToggleTimer();
+		GameInstance->StartDay();
 }
 
 bool AStartBell::CanInteract()

@@ -4,6 +4,8 @@
 #include "GameFramework/Actor.h"
 #include "DishSpawner.generated.h"
 
+class ADish;
+
 UCLASS()
 class INTERACTIONSYSTEM_API ADishSpawner : public AActor
 {
@@ -11,7 +13,14 @@ class INTERACTIONSYSTEM_API ADishSpawner : public AActor
 	
 public:	
 	ADishSpawner();
-
+	
+	UPROPERTY(VisibleAnywhere, Category = "Spawner", meta = (DisplayPriority = 0))
+	TArray<ADish*> SpawnedDishes;
+	
+	void StartSpawning();
+	void StopSpawning();
+	void CheckAllDishesWashed();
+	
 protected:
 
 	UPROPERTY(EditAnywhere, Category = "Spawner", meta = (DisplayPriority = 0))
@@ -28,6 +37,9 @@ protected:
 	
 	float RandomSpawnDelay;
 	FTimerHandle SpawnTimerHandle;
+	FTimerHandle CheckDishesHandle;
+	
+	
 	
 	void SpawnDish();
 	FVector GetRandomSpawnPoint();
