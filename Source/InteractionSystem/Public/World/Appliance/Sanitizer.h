@@ -22,9 +22,6 @@ class INTERACTIONSYSTEM_API ASanitizer : public AActor,  public IInteractionInte
 public:	
 	ASanitizer();
 	
-	UPROPERTY(EditInstanceOnly, Category = "Sanitizer")
-	FInteractableData InstanceInteractableData;
-	
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 	
@@ -32,13 +29,15 @@ public:
 	virtual void EndFocus() override;
 	virtual void Interact(ADSCharacter* PlayerCharacter) override;
 	virtual bool CanInteract() override;
-
+	virtual FText GetInteractionHeader() override;
+	virtual FText GetInteractionText() override;
+	
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "Sanitizer", meta = (DisplayPriority = 0))
 	ESanitizerState SanitizerState;
 	
 	UPROPERTY(EditAnywhere, Category = "Sanitizer", meta = (DisplayPriority = 0))
-	bool bCanInteract;
+	int DisinfectantAmount;
 
 	UPROPERTY(EditAnywhere, Category = "Sanitizer", meta = (DisplayPriority = 0))
 	TArray<UMaterialInterface*> Materials;

@@ -2,6 +2,8 @@
 #include "Data/ItemDataStructs.h"
 #include "InteractionSystem/DSCharacter.h"
 #include "Items/Dish.h"
+#include "Items/Disinfectant.h"
+#include "Items/Soap.h"
 
 ATrashCan::ATrashCan()
 {
@@ -22,8 +24,6 @@ void ATrashCan::BeginPlay()
 	Super::BeginPlay();
 
 	LastMousePosition = FVector::ZeroVector;
-	
-	InteractableData = InstanceInteractableData;
 
 	Player = Cast<ADSCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn());
 }
@@ -65,13 +65,7 @@ void ATrashCan::Interact(ADSCharacter* PlayerCharacter)
 		case EItemType::Soap:
 				
 			break;
-		case EItemType::Sanitizer:
-				
-			break;
-		case EItemType::Faucet:
-				
-			break;
-		case EItemType::Plate:
+		case EItemType::Disinfectant:
 				
 			break;
 	}
@@ -79,7 +73,32 @@ void ATrashCan::Interact(ADSCharacter* PlayerCharacter)
 
 bool ATrashCan::CanInteract()
 {
-	return bCanInteract;
+	switch(Player->GetHeldItemType())
+	{
+		case EItemType::None:
+			return false;
+
+		case EItemType::Soap:
+			return true;
+	
+		case EItemType::Disinfectant:
+			return true;
+
+		case EItemType::Dish:
+			return Cast<ADish>(Player->HeldItem)->GetDishState() == EDishState::Dirty;
+	}
+	
+	return false;
+}
+
+FText ATrashCan::GetInteractionHeader()
+{
+	return FText::FromString("Trash Can");
+}
+
+FText ATrashCan::GetInteractionText()
+{
+	return FText::FromString("Press E To Throw Away");
 }
 
 void ATrashCan::StartScraping()

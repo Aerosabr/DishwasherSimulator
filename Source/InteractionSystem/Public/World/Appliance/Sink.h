@@ -21,9 +21,6 @@ class INTERACTIONSYSTEM_API ASink : public AActor,  public IInteractionInterface
 public:	
 	ASink();
 	
-	UPROPERTY(EditInstanceOnly, Category = "Test Actor")
-	FInteractableData InstanceInteractableData;
-	
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 	

@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -7,9 +5,9 @@
 #include "InteractionHUD.generated.h"
 
 class UGameWidget;
-struct FInteractableData;
 class UMainMenu;
 class UInteractionWidget;
+class UInteractionHeader;
 
 UCLASS()
 class INTERACTIONSYSTEM_API AInteractionHUD : public AHUD
@@ -24,6 +22,9 @@ public:
 	TSubclassOf<UInteractionWidget> InteractionWidgetClass;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
+	TSubclassOf<UInteractionHeader> InteractionHeaderClass;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
 	TSubclassOf<UUserWidget> CrosshairClass;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
@@ -36,10 +37,13 @@ public:
 	void DisplayMenu();
 	void HideMenu();
 	void ToggleMenu();
-	
+
+	void ShowInteractionHeader() const;
+	void HideInteractionHeader() const;
+	void UpdateInteractionHeader(const FText& InteractableName) const;
 	void ShowInteractionWidget() const;
 	void HideInteractionWidget() const;
-	void UpdateInteractionWidget(const FInteractableData* InteractableData) const;
+	void UpdateInteractionWidget(const FText& InteractionText) const;
 	void UpdateGameWidgetMoney() const;
 	void UpdateGameWidgetTime() const;
 	
@@ -47,9 +51,12 @@ protected:
 	UPROPERTY()
 	UMainMenu* MainMenuWidget;
 
-	UPROPERTY(VisibleAnywhere, Category = "Interaction Widget")
+	UPROPERTY(VisibleAnywhere, Category = "Widgets")
 	UInteractionWidget* InteractionWidget;
 
+	UPROPERTY(VisibleAnywhere, Category = "Widgets")
+	UInteractionHeader* InteractionHeader;
+	
 	UPROPERTY()
 	UUserWidget* CrosshairWidget;
 

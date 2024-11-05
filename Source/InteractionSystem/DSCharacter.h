@@ -75,7 +75,6 @@ public:
 	
 	USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
 	UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
-	FORCEINLINE bool IsInteracting() const { return GetWorldTimerManager().IsTimerActive((TimerHandle_Interaction));};
 	FORCEINLINE bool GetIsHoldingItem() const { return bIsHoldingItem; };
 	FORCEINLINE EItemType GetHeldItemType() const { return ItemHeldType; };
 	void SetIsHoldingItem(bool toggle, EItemType itemType);
@@ -101,12 +100,11 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, Category = "Character", meta = (DisplayPriority = 0))
 	bool bCanMove;
-	
-	FTimerHandle TimerHandle_Interaction;
 
 	FInteractionData InteractionData;
 	
 	void PerformInteractionCheck();
+	void DisplayHeader(const FText& InteractableName) const;
 	void FoundInteractable(AActor* NewInteractable);
 	void NoInteractableFound();
 	void Interact();

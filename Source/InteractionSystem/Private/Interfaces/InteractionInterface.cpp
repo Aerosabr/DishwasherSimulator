@@ -1,9 +1,5 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "Interfaces/InteractionInterface.h"
 
-// Add default functionality here for any IInteractionInterface functions that are not pure virtual.
 void IInteractionInterface::BeginFocus()
 {
 }
@@ -19,4 +15,14 @@ void IInteractionInterface::Interact(ADSCharacter* PlayerCharacter)
 bool IInteractionInterface::CanInteract()
 {
 	return false;
+}
+
+FText IInteractionInterface::GetInteractionHeader()
+{
+	return FText::GetEmpty();
+}
+
+FText IInteractionInterface::GetInteractionText()
+{
+	return FText::GetEmpty();
 }

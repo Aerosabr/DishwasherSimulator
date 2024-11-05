@@ -18,9 +18,6 @@ class INTERACTIONSYSTEM_API ADish : public AActor,  public IInteractionInterface
 public:	
 	ADish();
 	
-	UPROPERTY(EditInstanceOnly, Category = "Plate")
-	FInteractableData InstanceInteractableData;
-	
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 	
@@ -29,31 +26,30 @@ public:
 	virtual void Interact(ADSCharacter* PlayerCharacter) override;
 	virtual bool CanInteract() override;
 	virtual void DropItem(ADSCharacter* PlayerCharacter) override;
+	virtual FText GetInteractionHeader() override;
+	virtual FText GetInteractionText() override;
 	FORCEINLINE EDishState GetDishState() const { return DishState; };
 	void ProgressDishState();
 	void SetDishMesh();
 	
 protected:
 	
-	UPROPERTY(EditAnywhere, Category = "Plate")
-	bool bCanInteract;
-
-	UPROPERTY(VisibleAnywhere, Category = "Plate")
+	UPROPERTY(VisibleAnywhere, Category = "Dish")
 	EDishState DishState;
 	
-	UPROPERTY(EditAnywhere, Category = "Plate")
+	UPROPERTY(EditAnywhere, Category = "Dish")
 	UStaticMeshComponent* DishMesh;
 
-	UPROPERTY(EditAnywhere, Category = "Plate")
+	UPROPERTY(EditAnywhere, Category = "Dish")
 	TArray<UStaticMesh*> DishMeshes;
 
-	UPROPERTY(EditAnywhere, Category = "Plate")
+	UPROPERTY(EditAnywhere, Category = "Dish")
 	TArray<UNiagaraSystem*> Particles;
 
-	UPROPERTY(EditAnywhere, Category = "Plate")
+	UPROPERTY(EditAnywhere, Category = "Dish")
 	UNiagaraComponent* Particle;
 	
-	UPROPERTY(EditAnywhere, Category = "Plate")
+	UPROPERTY(EditAnywhere, Category = "Dish")
 	FDataTableRowHandle ItemRowHandle;
 	
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;

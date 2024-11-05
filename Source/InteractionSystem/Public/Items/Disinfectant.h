@@ -3,31 +3,35 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Interfaces/InteractionInterface.h"
-#include "DishRack.generated.h"
+#include "Interfaces/Pickup.h"
+#include "Disinfectant.generated.h"
 
 UCLASS()
-class INTERACTIONSYSTEM_API ADishRack : public AActor,  public IInteractionInterface
+class INTERACTIONSYSTEM_API ADisinfectant : public AActor,  public IInteractionInterface, public IPickup
 {
 	GENERATED_BODY()
 	
 public:	
-	ADishRack();
+	ADisinfectant();
 	
 	virtual void BeginFocus() override;
 	virtual void EndFocus() override;
 	virtual void Interact(ADSCharacter* PlayerCharacter) override;
 	virtual bool CanInteract() override;
+	virtual void DropItem(ADSCharacter* PlayerCharacter) override;
 	virtual FText GetInteractionHeader() override;
 	virtual FText GetInteractionText() override;
-protected:
+	FORCEINLINE int GetDisinfectantAmount() const { return DisinfectantAmount; };
 	
-	UPROPERTY(EditAnywhere, Category = "Dish Rack", meta = (DisplayPriority = 0))
-	UStaticMeshComponent* RackMesh;
+protected:
 
-	UPROPERTY(EditAnywhere, Category = "Dish Rack", meta = (DisplayPriority = 0))
-	ADSCharacter* Player;
+	UPROPERTY(EditAnywhere, Category = "Disinfectant")
+	int DisinfectantAmount;
+
+	UPROPERTY(EditAnywhere, Category = "Disinfectant")
+	UStaticMeshComponent* DisinfectantMesh;
 	
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
-
+	
 };

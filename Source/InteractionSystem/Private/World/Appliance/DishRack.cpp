@@ -20,8 +20,8 @@ ADishRack::ADishRack()
 void ADishRack::BeginPlay()
 {
 	Super::BeginPlay();
-
-	InteractableData = InstanceInteractableData;
+	
+	Player = Cast<ADSCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn());
 }
 
 void ADishRack::Tick(float DeltaTime)
@@ -69,7 +69,20 @@ void ADishRack::Interact(ADSCharacter* PlayerCharacter)
 
 bool ADishRack::CanInteract()
 {
-	return bCanInteract;
+	if (Player->GetHeldItemType() == EItemType::Dish)
+		return Cast<ADish>(Player->HeldItem)->GetDishState() == EDishState::Sanitized;
+
+	return false;
+}
+
+FText ADishRack::GetInteractionHeader()
+{
+	return FText::FromString("Dish Rack");
+}
+
+FText ADishRack::GetInteractionText()
+{
+	return FText::FromString("Press E To Submit Dish");
 }
 
 

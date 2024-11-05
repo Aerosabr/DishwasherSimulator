@@ -22,8 +22,6 @@ void ARinser::BeginPlay()
 	Super::BeginPlay();
 
 	LastMousePosition = FVector::ZeroVector;
-	
-	InteractableData = InstanceInteractableData;
 
 	Player = Cast<ADSCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn());
 }
@@ -65,13 +63,7 @@ void ARinser::Interact(ADSCharacter* PlayerCharacter)
 		case EItemType::Soap:
 					
 			break;
-		case EItemType::Sanitizer:
-					
-			break;
-		case EItemType::Faucet:
-					
-			break;
-		case EItemType::Plate:
+		case EItemType::Disinfectant:
 					
 			break;
 	}
@@ -79,7 +71,20 @@ void ARinser::Interact(ADSCharacter* PlayerCharacter)
 
 bool ARinser::CanInteract()
 {
-	return bCanInteract;
+	if (Player->GetHeldItemType() == EItemType::Dish)
+		return Cast<ADish>(Player->HeldItem)->GetDishState() == EDishState::Washed;
+
+	return false;
+}
+
+FText ARinser::GetInteractionHeader()
+{
+	return FText::FromString("Rinser");
+}
+
+FText ARinser::GetInteractionText()
+{
+	return FText::FromString("Press E To Rinse");
 }
 
 void ARinser::StartRinsing()

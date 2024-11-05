@@ -113,28 +113,35 @@ void ADSCharacter::PerformInteractionCheck()
 		{
 			if (TraceHit.GetActor() != InteractionData.CurrentInteractable)
 			{
-				if(IInteractionInterface* TheInterface = Cast<IInteractionInterface>(TraceHit.GetActor()))
-					if (TheInterface->CanInteract())
-						FoundInteractable(TraceHit.GetActor());
-				
-				return;
+				IInteractionInterface* TheInterface = Cast<IInteractionInterface>(TraceHit.GetActor());
+				DisplayHeader(TheInterface->GetInteractionHeader());
+					
+				if (TheInterface->CanInteract())
+				{
+					FoundInteractable(TraceHit.GetActor());
+					return;
+				}
 			}
 
 			if (TraceHit.GetActor() == InteractionData.CurrentInteractable)
 				return;
 		}
+		else
+			HUD->HideInteractionHeader();
 	}
-
+	else
+		HUD->HideInteractionHeader();
+	
 	NoInteractableFound();
+}
+
+void ADSCharacter::DisplayHeader(const FText& InteractableName) const
+{
+	HUD->UpdateInteractionHeader(InteractableName);
 }
 
 void ADSCharacter::FoundInteractable(AActor* NewInteractable)
 {
-	/*
-	if (IsInteracting())
-		EndInteract();
-	*/
-	
 	if (InteractionData.CurrentInteractable)
 	{
 		TargetInteractable = InteractionData.CurrentInteractable;
@@ -143,24 +150,21 @@ void ADSCharacter::FoundInteractable(AActor* NewInteractable)
 
 	InteractionData.CurrentInteractable = NewInteractable;
 	TargetInteractable = NewInteractable;
-
-	HUD->UpdateInteractionWidget(&TargetInteractable->InteractableData);
+	
+	HUD->UpdateInteractionWidget(Cast<IInteractionInterface>(NewInteractable)->GetInteractionText());
 	
 	TargetInteractable->BeginFocus();
 }
 
 void ADSCharacter::NoInteractableFound()
 {
-	if (IsInteracting())
-		GetWorldTimerManager().ClearTimer(TimerHandle_Interaction);
-
 	if (InteractionData.CurrentInteractable)
 	{
 		if (IsValid(TargetInteractable.GetObject()))
 			TargetInteractable->EndFocus();
 
 		HUD->HideInteractionWidget();
-
+		
 		InteractionData.CurrentInteractable = nullptr;
 		TargetInteractable = nullptr;
 	}
@@ -172,25 +176,8 @@ void ADSCharacter::Interact()
 	PerformInteractionCheck();
 	
 	if (InteractionData.CurrentInteractable)
-	{
 		if (IsValid(TargetInteractable.GetObject()))
-		{
-			if (FMath::IsNearlyZero(TargetInteractable->InteractableData.InteractionDuration, 0.1f))
-			{
-				GetWorldTimerManager().ClearTimer(TimerHandle_Interaction);
-				if (IsValid(TargetInteractable.GetObject()))
-					TargetInteractable->Interact(this);
-			}
-			else
-			{
-				GetWorldTimerManager().SetTimer(TimerHandle_Interaction,
-					this,
-					&ADSCharacter::Interact,
-					TargetInteractable->InteractableData.InteractionDuration,
-					false);
-			}
-		}
-	}
+			TargetInteractable->Interact(this);
 }
 
 void ADSCharacter::DropHeldItem()
@@ -220,7 +207,7 @@ void ADSCharacter::SetIsHoldingItem(bool toggle, EItemType itemType)
 void ADSCharacter::UpdateInteractionWidget() const
 {
 	if (IsValid(TargetInteractable.GetObject()))
-		HUD->UpdateInteractionWidget(&TargetInteractable->InteractableData);
+		HUD->UpdateInteractionWidget(TargetInteractable->GetInteractionText());
 }
 
 void ADSCharacter::ToggleMovement(bool toggle)

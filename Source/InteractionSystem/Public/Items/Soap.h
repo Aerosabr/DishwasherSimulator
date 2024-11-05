@@ -3,31 +3,36 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Interfaces/InteractionInterface.h"
-#include "StartBell.generated.h"
+#include "Interfaces/Pickup.h"
+#include "Soap.generated.h"
 
 UCLASS()
-class INTERACTIONSYSTEM_API AStartBell : public AActor,  public IInteractionInterface
+class INTERACTIONSYSTEM_API ASoap : public AActor,  public IInteractionInterface, public IPickup
 {
 	GENERATED_BODY()
 	
 public:	
-	AStartBell();
-	
-	UPROPERTY(EditAnywhere, Category = "StartBell", meta = (DisplayPriority = 0))
-	bool bCanInteract;
+	ASoap();
 	
 	virtual void BeginFocus() override;
 	virtual void EndFocus() override;
 	virtual void Interact(ADSCharacter* PlayerCharacter) override;
 	virtual bool CanInteract() override;
+	virtual void DropItem(ADSCharacter* PlayerCharacter) override;
+	
 	virtual FText GetInteractionHeader() override;
 	virtual FText GetInteractionText() override;
-protected:
+	FORCEINLINE int GetSoapAmount() const {	return SoapAmount; };
 	
-	UPROPERTY(EditAnywhere, Category = "StartBell", meta = (DisplayPriority = 0))
-	UStaticMeshComponent* BellMesh;
+protected:
+
+	UPROPERTY(EditAnywhere, Category = "Soap")
+	int SoapAmount;
+	
+	UPROPERTY(EditAnywhere, Category = "Soap")
+	UStaticMeshComponent* SoapMesh;
 	
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
-
+	
 };

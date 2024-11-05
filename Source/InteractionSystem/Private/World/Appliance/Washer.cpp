@@ -2,6 +2,7 @@
 #include "Data/ItemDataStructs.h"
 #include "InteractionSystem/DSCharacter.h"
 #include "Items/Dish.h"
+#include "Items/Soap.h"
 
 AWasher::AWasher()
 {
@@ -10,6 +11,8 @@ AWasher::AWasher()
 	WasherMesh = CreateDefaultSubobject<UStaticMeshComponent>("WasherMesh");
 	SetRootComponent(WasherMesh);
 
+	SoapAmount = 0;
+	
 	// Scrubbing variables
 	bIsScrubbing = false;
 	RotationCenter = FVector(0.f, 0.f, 0.f);
@@ -23,7 +26,6 @@ void AWasher::BeginPlay()
 
 	LastMousePosition = FVector::ZeroVector;
 	
-	InteractableData = InstanceInteractableData;
 	WasherState = EWasherState::Dirty;
 	SetWaterMesh();
 	
@@ -67,21 +69,43 @@ void AWasher::Interact(ADSCharacter* PlayerCharacter)
 		case EItemType::Soap:
 				
 			break;
-		case EItemType::Sanitizer:
+		case EItemType::Disinfectant:
 				
 			break;
-		case EItemType::Faucet:
-				
-			break;
-		case EItemType::Plate:
-				
-			break;
+		
 	}
 }
 
 bool AWasher::CanInteract()
 {
-	return bCanInteract;
+	switch(Player->GetHeldItemType())
+	{
+		case EItemType::None:
+			return WasherState == EWasherState::Dirty;
+
+		case EItemType::Soap:
+			return Cast<ASoap>(Player->HeldItem)->GetSoapAmount() != 0;
+		
+		case EItemType::Disinfectant:
+			return false;
+			
+		case EItemType::Dish:
+			if (Cast<ADish>(Player->HeldItem)->GetDishState() == EDishState::Scraped)
+				return true;
+			return false;
+		default:
+			return false;
+	}
+}
+
+FText AWasher::GetInteractionHeader()
+{
+	return FText::FromString("Washer");
+}
+
+FText AWasher::GetInteractionText()
+{
+	return FText::FromString("Press E To Wash");
 }
 
 void AWasher::StartWashing()

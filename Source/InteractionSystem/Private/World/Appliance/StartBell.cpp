@@ -18,6 +18,7 @@ void AStartBell::BeginPlay()
 
 	if (UDSManager* GameInstance = Cast<UDSManager>(GetGameInstance()))
 		GameInstance->SetBell(this);
+	
 }
 
 void AStartBell::Tick(float DeltaTime)
@@ -47,4 +48,14 @@ void AStartBell::Interact(ADSCharacter* PlayerCharacter)
 bool AStartBell::CanInteract()
 {
 	return bCanInteract;
+}
+
+FText AStartBell::GetInteractionHeader()
+{
+	return FText::FromString("Bell");
+}
+
+FText AStartBell::GetInteractionText()
+{
+	return FText::FromString("Press E To Start Day");
 }

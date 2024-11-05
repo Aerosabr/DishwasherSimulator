@@ -2,6 +2,7 @@
 #include "Data/ItemDataStructs.h"
 #include "InteractionSystem/DSCharacter.h"
 #include "Items/Dish.h"
+#include "Items/Disinfectant.h"
 #include "Manager/DSManager.h"
 
 ASanitizer::ASanitizer()
@@ -11,6 +12,8 @@ ASanitizer::ASanitizer()
 	SanitizerMesh = CreateDefaultSubobject<UStaticMeshComponent>("SanitizerMesh");
 	SetRootComponent(SanitizerMesh);
 
+	DisinfectantAmount = 0;
+	
 	// Scrubbing variables
 	bIsScrubbing = false;
 	RotationCenter = FVector(0.f, 0.f, 0.f);
@@ -24,7 +27,6 @@ void ASanitizer::BeginPlay()
 
 	LastMousePosition = FVector::ZeroVector;
 	
-	InteractableData = InstanceInteractableData;
 	SanitizerState = ESanitizerState::Sanitized;
 	SetWaterMesh();
 	
@@ -68,13 +70,7 @@ void ASanitizer::Interact(ADSCharacter* PlayerCharacter)
 		case EItemType::Soap:
 					
 			break;
-		case EItemType::Sanitizer:
-					
-			break;
-		case EItemType::Faucet:
-					
-			break;
-		case EItemType::Plate:
+		case EItemType::Disinfectant:
 					
 			break;
 	}
@@ -83,7 +79,34 @@ void ASanitizer::Interact(ADSCharacter* PlayerCharacter)
 
 bool ASanitizer::CanInteract()
 {
-	return bCanInteract;
+	switch(Player->GetHeldItemType())
+	{
+		case EItemType::None:
+			return false;
+
+		case EItemType::Soap:
+			return false;
+	
+		case EItemType::Disinfectant:
+			return Cast<ADisinfectant>(Player->HeldItem)->GetDisinfectantAmount() != 0;
+		
+		case EItemType::Dish:
+			if (Cast<ADish>(Player->HeldItem)->GetDishState() == EDishState::Rinsed)
+				return true;
+			return false;
+		default:
+			return false;
+	}
+}
+
+FText ASanitizer::GetInteractionHeader()
+{
+	return FText::FromString("Sanitizer");
+}
+
+FText ASanitizer::GetInteractionText()
+{
+	return FText::FromString("Press E To Sanitize");
 }
 
 void ASanitizer::StartSanitizing()

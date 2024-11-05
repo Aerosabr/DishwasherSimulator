@@ -29,9 +29,7 @@ enum class EItemType : uint8
 {
 	None UMETA(DisplayName = "None"),
 	Soap UMETA(DisplayName = "Soap"),
-	Sanitizer UMETA(DisplayName = "Sanitizer"),
-	Faucet UMETA(DisplayName = "Faucet"),
-	Plate UMETA(DisplayName = "Plate"),
+	Disinfectant UMETA(DisplayName = "Disinfectant"),
 	Dish UMETA(DisplayName = "Dish")
 };
 

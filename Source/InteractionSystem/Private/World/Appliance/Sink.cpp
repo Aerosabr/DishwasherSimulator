@@ -14,7 +14,6 @@ void ASink::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	InteractableData = InstanceInteractableData;
 	WaterState = EWaterState::Dirty;
 	SetWaterMesh();
 }

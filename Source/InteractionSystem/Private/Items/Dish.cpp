@@ -18,9 +18,8 @@ ADish::ADish()
 void ADish::BeginPlay()
 {
 	Super::BeginPlay();
-	InteractableData = InstanceInteractableData;
+
 	DishState = EDishState::Dirty;
-	//Cast<UPrimitiveComponent>(GetComponentByClass(UPrimitiveComponent::StaticClass()))->SetSimulatePhysics(false);
 }
 
 void ADish::Tick(float DeltaTime)
@@ -28,8 +27,8 @@ void ADish::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	if (Particle && RootComponent)
 	{
-		Particle->SetWorldLocation(RootComponent->GetComponentLocation()); // Set location to match RootComponent
-		Particle->SetWorldRotation(RootComponent->GetComponentRotation()); // Set rotation to match RootComponent
+		Particle->SetWorldLocation(RootComponent->GetComponentLocation()); 
+		Particle->SetWorldRotation(RootComponent->GetComponentRotation()); 
 	}
 }
 
@@ -65,7 +64,7 @@ void ADish::Interact(ADSCharacter* PlayerCharacter)
 
 bool ADish::CanInteract()
 {
-	return bCanInteract;
+	return !Cast<ADSCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn())->GetIsHoldingItem();
 }
 
 void ADish::DropItem(ADSCharacter* PlayerCharacter)
@@ -102,6 +101,16 @@ void ADish::DropItem(ADSCharacter* PlayerCharacter)
 	
 	Cast<UPrimitiveComponent>(GetComponentByClass(UPrimitiveComponent::StaticClass()))->SetSimulatePhysics(true);
 	DishMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+}
+
+FText ADish::GetInteractionHeader()
+{
+	return FText::FromString("Dish");
+}
+
+FText ADish::GetInteractionText()
+{
+	return FText::FromString("Press E To Pick Up Dish");
 }
 
 void ADish::ProgressDishState()

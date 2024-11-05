@@ -3,6 +3,7 @@
 #include "Components/TextBlock.h"
 #include "Manager/DSManager.h"
 #include "UserInterface/MainMenu.h"
+#include "UserInterface/Interaction/InteractionHeader.h"
 #include "UserInterface/Interaction/InteractionWidget.h"
 #include "UserInterface/GameWidget.h"
 AInteractionHUD::AInteractionHUD()
@@ -27,6 +28,13 @@ void AInteractionHUD::BeginPlay()
 		InteractionWidget->SetVisibility(ESlateVisibility::Collapsed);
 	}
 
+	if (InteractionHeaderClass)
+	{
+		InteractionHeader = CreateWidget<UInteractionHeader>(GetWorld(), InteractionHeaderClass);
+		InteractionHeader->AddToViewport(-1);
+		InteractionHeader->SetVisibility(ESlateVisibility::Collapsed);
+	}
+	
 	if (GameWidgetClass)
 	{
 		GameWidget = CreateWidget<UGameWidget>(GetWorld(), GameWidgetClass);
@@ -77,30 +85,49 @@ void AInteractionHUD::ToggleMenu()
 	}
 }
 
+void AInteractionHUD::ShowInteractionHeader() const
+{
+	if (InteractionHeader)
+		InteractionHeader->SetVisibility(ESlateVisibility::Visible);
+}
+
+void AInteractionHUD::HideInteractionHeader() const
+{
+	if (InteractionHeader)
+		InteractionHeader->SetVisibility(ESlateVisibility::Collapsed);
+}
+
+void AInteractionHUD::UpdateInteractionHeader(const FText& InteractableName) const
+{
+	if (InteractionHeader)
+	{
+		if (InteractionHeader->GetVisibility() == ESlateVisibility::Collapsed)
+			InteractionHeader->SetVisibility(ESlateVisibility::Visible);
+
+		InteractionHeader->UpdateWidget(InteractableName);
+	}
+}
+
 void AInteractionHUD::ShowInteractionWidget() const
 {
 	if (InteractionWidget)
-	{
 		InteractionWidget->SetVisibility(ESlateVisibility::Visible);
-	}
 }
 
 void AInteractionHUD::HideInteractionWidget() const
 {
 	if (InteractionWidget)
-	{
 		InteractionWidget->SetVisibility(ESlateVisibility::Collapsed);
-	}
 }
 
-void AInteractionHUD::UpdateInteractionWidget(const FInteractableData* InteractableData) const
+void AInteractionHUD::UpdateInteractionWidget(const FText& InteractionText) const
 {
 	if (InteractionWidget)
 	{
 		if (InteractionWidget->GetVisibility() == ESlateVisibility::Collapsed)
 			InteractionWidget->SetVisibility(ESlateVisibility::Visible);
 
-		InteractionWidget->UpdateWidget(InteractableData);
+		InteractionWidget->UpdateWidget(InteractionText);
 	}
 }
 
