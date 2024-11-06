@@ -63,7 +63,7 @@ protected:
 	FVector GetCurrentMousePosition();
 	
 	void SetWaterMesh();
-
-	void InteractedWithDish(ADSCharacter* PlayerCharacter);
+	void InteractedWithDish();
+	void InteractedWithSoap();
 };
 

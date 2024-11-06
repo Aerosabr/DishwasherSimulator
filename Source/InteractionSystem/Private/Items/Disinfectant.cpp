@@ -15,7 +15,7 @@ void ADisinfectant::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	DisinfectantAmount = 1200;
+	DisinfectantAmount = 640;
 }
 
 void ADisinfectant::Tick(float DeltaTime)
@@ -97,7 +97,7 @@ void ADisinfectant::DropItem(ADSCharacter* PlayerCharacter)
 
 FText ADisinfectant::GetInteractionHeader()
 {
-	return FText::FromString("Disinfectant");
+	return FText::Format(FText::FromString("Disinfectant\n{0}oz / {1}oz"), FText::AsNumber(DisinfectantAmount / 10.0f), FText::AsNumber(64));
 }
 
 FText ADisinfectant::GetInteractionText()

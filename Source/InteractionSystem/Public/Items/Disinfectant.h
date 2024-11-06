@@ -13,6 +13,9 @@ class INTERACTIONSYSTEM_API ADisinfectant : public AActor,  public IInteractionI
 	
 public:	
 	ADisinfectant();
+
+	UPROPERTY(EditAnywhere, Category = "Disinfectant")
+	int DisinfectantAmount;
 	
 	virtual void BeginFocus() override;
 	virtual void EndFocus() override;
@@ -22,12 +25,9 @@ public:
 	virtual FText GetInteractionHeader() override;
 	virtual FText GetInteractionText() override;
 	FORCEINLINE int GetDisinfectantAmount() const { return DisinfectantAmount; };
-	
+
 protected:
-
-	UPROPERTY(EditAnywhere, Category = "Disinfectant")
-	int DisinfectantAmount;
-
+	
 	UPROPERTY(EditAnywhere, Category = "Disinfectant")
 	UStaticMeshComponent* DisinfectantMesh;
 	

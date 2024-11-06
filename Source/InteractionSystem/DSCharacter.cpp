@@ -1,6 +1,8 @@
 #include "DSCharacter.h"
 #include "Animation/AnimInstance.h"
 #include "Camera/CameraComponent.h"
+#include "Engine/Texture2D.h"
+#include "Styling/SlateBrush.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "EnhancedInputComponent.h"
@@ -61,6 +63,8 @@ void ADSCharacter::BeginPlay()
 	
 	HUD = Cast<AInteractionHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
 	ItemHeldType = EItemType::None;
+
+	GetWorld()->GetFirstPlayerController()->CurrentMouseCursor = EMouseCursor::GrabHand;
 }
 
 void ADSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)

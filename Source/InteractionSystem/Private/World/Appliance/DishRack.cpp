@@ -5,6 +5,7 @@
 #include "Items/Dish.h"
 #include "Items/DishSpawner.h"
 #include "Manager/DSManager.h"
+#include "UserInterface/InteractionHUD.h"
 
 class ADish;
 
@@ -58,6 +59,8 @@ void ADishRack::Interact(ADSCharacter* PlayerCharacter)
 		{
 			if (UDSManager* GameInstance = Cast<UDSManager>(GetGameInstance()))
 				GameInstance->Spawner->SpawnedDishes.RemoveSingle(TempDish);
+			Cast<AInteractionHUD>(GetWorld()->GetFirstPlayerController()->GetHUD())->HideInteractionWidget();
+			EndFocus();
 			PlayerCharacter->HeldItem->Destroy();
 			PlayerCharacter->HeldItem = nullptr;
 			PlayerCharacter->SetIsHoldingItem(false, EItemType::None);

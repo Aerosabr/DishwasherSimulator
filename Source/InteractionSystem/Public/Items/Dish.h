@@ -17,6 +17,9 @@ class INTERACTIONSYSTEM_API ADish : public AActor,  public IInteractionInterface
 	
 public:	
 	ADish();
+
+	UPROPERTY(VisibleAnywhere, Category = "Dish")
+	int DebrisAmount;
 	
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;

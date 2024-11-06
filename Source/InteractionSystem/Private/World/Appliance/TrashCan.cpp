@@ -4,6 +4,7 @@
 #include "Items/Dish.h"
 #include "Items/Disinfectant.h"
 #include "Items/Soap.h"
+#include "UserInterface/InteractionHUD.h"
 
 ATrashCan::ATrashCan()
 {
@@ -98,7 +99,19 @@ FText ATrashCan::GetInteractionHeader()
 
 FText ATrashCan::GetInteractionText()
 {
-	return FText::FromString("Press E To Throw Away");
+	switch(Player->GetHeldItemType())
+	{
+		case EItemType::Soap:
+			return FText::FromString("Press E To Throw Away");
+		
+		case EItemType::Disinfectant:
+			return FText::FromString("Press E To Throw Away");
+
+		case EItemType::Dish:
+			return FText::FromString("Press E To Scrape Waste");
+		default:
+			return FText::FromString("Press E To Throw Away");
+	}
 }
 
 void ATrashCan::StartScraping()
@@ -175,6 +188,8 @@ void ATrashCan::InteractedWithDish(ADSCharacter* PlayerCharacter)
 	if (ADish* TempDish = Cast<ADish>(PlayerCharacter->HeldItem); TempDish->GetDishState() == EDishState::Dirty)
 	{
 		PlayerCharacter->ToggleMovement(false);
+		Cast<AInteractionHUD>(GetWorld()->GetFirstPlayerController()->GetHUD())->HideInteractionWidget();
+		EndFocus();
 		StartScraping();
 	}
 }

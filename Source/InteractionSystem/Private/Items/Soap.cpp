@@ -15,7 +15,7 @@ void ASoap::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	SoapAmount = 1200;
+	SoapAmount = 640;
 }
 
 void ASoap::Tick(float DeltaTime)
@@ -97,7 +97,7 @@ void ASoap::DropItem(ADSCharacter* PlayerCharacter)
 
 FText ASoap::GetInteractionHeader()
 {
-	return FText::FromString("Soap");
+	return FText::Format(FText::FromString("Soap\n{0}oz / {1}oz"), FText::AsNumber(SoapAmount / 10.0f), FText::AsNumber(64));
 }
 
 FText ASoap::GetInteractionText()

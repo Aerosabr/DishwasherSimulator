@@ -4,6 +4,7 @@
 #include "Items/Dish.h"
 #include "Items/Disinfectant.h"
 #include "Manager/DSManager.h"
+#include "UserInterface/InteractionHUD.h"
 
 ASanitizer::ASanitizer()
 {
@@ -65,13 +66,13 @@ void ASanitizer::Interact(ADSCharacter* PlayerCharacter)
 			SetWaterMesh();
 			break;
 		case EItemType::Dish:
-			InteractedWithDish(PlayerCharacter);
+			InteractedWithDish();
 			break;
 		case EItemType::Soap:
-					
+			
 			break;
 		case EItemType::Disinfectant:
-					
+			InteractedWithDisinfectant();
 			break;
 	}
 	
@@ -88,12 +89,11 @@ bool ASanitizer::CanInteract()
 			return false;
 	
 		case EItemType::Disinfectant:
-			return Cast<ADisinfectant>(Player->HeldItem)->GetDisinfectantAmount() != 0;
+			return Cast<ADisinfectant>(Player->HeldItem)->GetDisinfectantAmount() != 0 && DisinfectantAmount != 160;
 		
 		case EItemType::Dish:
-			if (Cast<ADish>(Player->HeldItem)->GetDishState() == EDishState::Rinsed)
-				return true;
-			return false;
+			return Cast<ADish>(Player->HeldItem)->GetDishState() == EDishState::Rinsed && SanitizerState == ESanitizerState::Sanitized;
+		
 		default:
 			return false;
 	}
@@ -101,12 +101,33 @@ bool ASanitizer::CanInteract()
 
 FText ASanitizer::GetInteractionHeader()
 {
-	return FText::FromString("Sanitizer");
+	FText HeaderText;
+	switch (SanitizerState)
+	{
+		case ESanitizerState::Default:
+			HeaderText = FText::FromString("Sanitizer\nClear Water");
+			break;
+		case ESanitizerState::Sanitized:
+			HeaderText = FText::Format(FText::FromString("Sanitizer\nDisinfectant ({0}%)"), FText::AsNumber((DisinfectantAmount * 100) / 160));
+			break;
+	}
+	
+	return HeaderText;
 }
 
 FText ASanitizer::GetInteractionText()
 {
-	return FText::FromString("Press E To Sanitize");
+	switch(Player->GetHeldItemType())
+	{
+		case EItemType::Disinfectant:
+			return FText::FromString("Press E To Fill");
+			
+		case EItemType::Dish:
+			return FText::FromString("Press E To Sanitize");
+	
+		default:
+			return FText::FromString("Press E To Sanitize");
+	}
 }
 
 void ASanitizer::StartSanitizing()
@@ -152,7 +173,13 @@ void ASanitizer::CalculateDistance(FVector MousePosition)
 			PlayerController->SetInputMode(FInputModeGameOnly());
 			PlayerController->bShowMouseCursor = false;
 		}
-		
+		DisinfectantAmount = FMath::Max(DisinfectantAmount -= Cast<ADish>(Player->HeldItem)->DebrisAmount, 0);
+		if (DisinfectantAmount == 0)
+		{
+			SanitizerState = ESanitizerState::Default;
+			SanitizerMesh->SetMaterial(2, Materials[1]);
+		}
+		Cast<AInteractionHUD>(GetWorld()->GetFirstPlayerController()->GetHUD())->UpdateInteractionHeader(GetInteractionHeader());
 		Cast<ADish>(Player->HeldItem)->ProgressDishState();
 		Player->ToggleMovement(true);
 		FSlateApplication::Get().ClearKeyboardFocus(EFocusCause::Cleared);
@@ -195,13 +222,34 @@ void ASanitizer::SetWaterMesh()
 	}
 }
 
-void ASanitizer::InteractedWithDish(ADSCharacter* PlayerCharacter)
+void ASanitizer::InteractedWithDish()
 {
-	if (ADish* TempDish = Cast<ADish>(PlayerCharacter->HeldItem); TempDish->GetDishState() == EDishState::Rinsed)
+	if (ADish* TempDish = Cast<ADish>(Player->HeldItem); TempDish->GetDishState() == EDishState::Rinsed)
 	{
-		PlayerCharacter->ToggleMovement(false);
+		Player->ToggleMovement(false);
+		Cast<AInteractionHUD>(GetWorld()->GetFirstPlayerController()->GetHUD())->HideInteractionWidget();
+		EndFocus();
 		StartSanitizing();
 	}
+}
+
+void ASanitizer::InteractedWithDisinfectant()
+{
+	ADisinfectant* Disinfectant = Cast<ADisinfectant>(Player->HeldItem);
+	
+	const int MaxAmount = 160;
+	int TransferAmount = MaxAmount - DisinfectantAmount;
+	TransferAmount = FMath::Min(Disinfectant->DisinfectantAmount, TransferAmount);
+
+	Disinfectant->DisinfectantAmount -= TransferAmount;
+	DisinfectantAmount += TransferAmount;
+	
+	Cast<AInteractionHUD>(GetWorld()->GetFirstPlayerController()->GetHUD())->HideInteractionWidget();
+	EndFocus();
+	
+	SanitizerState = ESanitizerState::Sanitized;
+	SanitizerMesh->SetMaterial(2, Materials[0]);
+	Cast<AInteractionHUD>(GetWorld()->GetFirstPlayerController()->GetHUD())->UpdateInteractionHeader(GetInteractionHeader());
 }
 
 

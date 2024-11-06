@@ -22,18 +22,6 @@ public:
 	
 	UPROPERTY(VisibleAnywhere, Category = "Item")
 	FName ID;
-	
-	UPROPERTY(VisibleAnywhere, Category = "Item")
-	EItemType ItemType;
-
-	UPROPERTY(VisibleAnywhere, Category = "Item")
-	EItemQuality ItemQuality;
-
-	UPROPERTY(VisibleAnywhere, Category = "Item")
-	FItemStatistics ItemStatistics;
-
-	UPROPERTY(VisibleAnywhere, Category = "Item")
-	FItemTextData TextData;
 
 	UPROPERTY(VisibleAnywhere, Category = "Item")
 	FItemAssetData AssetData;
@@ -47,12 +35,6 @@ public:
 	
 	UFUNCTION(Category = "Item")
 	UItemBase* CreateItemCopy();
-
-	UFUNCTION(Category = "Item")
-	FORCEINLINE float GetItemBuyValue() const { return ItemStatistics.BuyValue; };
-
-	UFUNCTION(Category = "Item")
-	FORCEINLINE float GetItemSellValue() const { return ItemStatistics.SellValue; };
 
 	UFUNCTION(Category = "Item")
 	void SetQuantity(const int32 NewQuantity);

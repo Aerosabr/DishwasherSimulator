@@ -15,16 +15,6 @@ enum class EDishState : uint8
 };
 
 UENUM()
-enum class EItemQuality : uint8
-{
-	Common UMETA(DisplayName = "Common"),
-	Uncommon UMETA(DisplayName = "Uncommon"),
-	Rare UMETA(DisplayName = "Rare"),
-	Epic UMETA(DisplayName = "Epic"),
-	Legendary UMETA(DisplayName = "Legendary"),
-};
-
-UENUM()
 enum class EItemType : uint8
 {
 	None UMETA(DisplayName = "None"),
@@ -34,54 +24,15 @@ enum class EItemType : uint8
 };
 
 USTRUCT()
-struct FItemStatistics
-{
-	GENERATED_USTRUCT_BODY()
-	
-	UPROPERTY(EditAnywhere)
-	float FaucetPower;
-
-	UPROPERTY(EditAnywhere)
-	float FaucetWaterUsage;
-
-	UPROPERTY(EditAnywhere)
-	float SoapPower;
-	
-	UPROPERTY(EditAnywhere)
-	int SoapUsages;
-
-	UPROPERTY(EditAnywhere)
-	float BuyValue;
-	
-	UPROPERTY(EditAnywhere)
-	float SellValue;
-};
-
-USTRUCT()
-struct FItemTextData
-{
-	GENERATED_USTRUCT_BODY()
-	
-	UPROPERTY(EditAnywhere)
-	FText Name;
-	
-	UPROPERTY(EditAnywhere)
-	FText Description;
-	
-	UPROPERTY(EditAnywhere)
-	FText InteractionText;
-	
-	UPROPERTY(EditAnywhere)
-	FText UsageText;
-};
-
-USTRUCT()
 struct FItemAssetData
 {
 	GENERATED_USTRUCT_BODY()
 
 	UPROPERTY(EditAnywhere)
 	TArray<UStaticMesh*> Meshes;
+
+	UPROPERTY(EditAnywhere)
+	int DebrisAmount;
 };
 
 USTRUCT()
@@ -91,18 +42,6 @@ struct FItemData : public FTableRowBase
 
 	UPROPERTY(EditAnywhere, Category = "Item Data")
 	FName ID;
-	
-	UPROPERTY(EditAnywhere, Category = "Item Data")
-	EItemType ItemType;
-
-	UPROPERTY(EditAnywhere, Category = "Item Data")
-	EItemQuality ItemQuality;
-
-	UPROPERTY(EditAnywhere, Category = "Item Data")
-	FItemStatistics ItemStatistics;
-
-	UPROPERTY(EditAnywhere, Category = "Item Data")
-	FItemTextData TextData;
 
 	UPROPERTY(EditAnywhere, Category = "Item Data")
 	FItemAssetData AssetData;

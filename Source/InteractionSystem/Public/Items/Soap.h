@@ -13,6 +13,9 @@ class INTERACTIONSYSTEM_API ASoap : public AActor,  public IInteractionInterface
 	
 public:	
 	ASoap();
+
+	UPROPERTY(EditAnywhere, Category = "Soap")
+	int SoapAmount;
 	
 	virtual void BeginFocus() override;
 	virtual void EndFocus() override;
@@ -25,9 +28,6 @@ public:
 	FORCEINLINE int GetSoapAmount() const {	return SoapAmount; };
 	
 protected:
-
-	UPROPERTY(EditAnywhere, Category = "Soap")
-	int SoapAmount;
 	
 	UPROPERTY(EditAnywhere, Category = "Soap")
 	UStaticMeshComponent* SoapMesh;

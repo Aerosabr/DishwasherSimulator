@@ -187,6 +187,7 @@ void ADish::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 			UE_LOG(LogTemp, Log, TEXT("PostEdit"));
 			const FItemData* ItemData = ItemRowHandle.GetRow<FItemData>(ItemRowHandle.RowName.ToString());
 			DishMeshes = ItemData->AssetData.Meshes;
+			DebrisAmount = ItemData->AssetData.DebrisAmount;
 			SetDishMesh();
 		}
 	}

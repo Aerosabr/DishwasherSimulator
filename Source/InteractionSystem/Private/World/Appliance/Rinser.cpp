@@ -2,6 +2,7 @@
 #include "Data/ItemDataStructs.h"
 #include "InteractionSystem/DSCharacter.h"
 #include "Items/Dish.h"
+#include "UserInterface/InteractionHUD.h"
 
 ARinser::ARinser()
 {
@@ -163,6 +164,8 @@ void ARinser::InteractedWithDish(ADSCharacter* PlayerCharacter)
 	if (ADish* TempDish = Cast<ADish>(PlayerCharacter->HeldItem); TempDish->GetDishState() == EDishState::Washed)
 	{
 		PlayerCharacter->ToggleMovement(false);
+		Cast<AInteractionHUD>(GetWorld()->GetFirstPlayerController()->GetHUD())->HideInteractionWidget();
+		EndFocus();
 		StartRinsing();
 	}
 }
