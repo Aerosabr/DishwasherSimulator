@@ -28,10 +28,13 @@ void ASanitizer::BeginPlay()
 
 	LastMousePosition = FVector::ZeroVector;
 	
-	SanitizerState = ESanitizerState::Sanitized;
+	SanitizerState = ESanitizerState::Default;
 	SetWaterMesh();
 	
 	Player = Cast<ADSCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn());
+	HUD = Cast<AInteractionHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
+
+	Cast<UDSManager>(GetGameInstance())->Sanitizer = this;
 }
 
 void ASanitizer::Tick(float DeltaTime)
@@ -63,7 +66,6 @@ void ASanitizer::Interact(ADSCharacter* PlayerCharacter)
 	switch(PlayerCharacter->GetHeldItemType())
 	{
 		case EItemType::None:
-			SetWaterMesh();
 			break;
 		case EItemType::Dish:
 			InteractedWithDish();
@@ -117,6 +119,9 @@ FText ASanitizer::GetInteractionHeader()
 
 FText ASanitizer::GetInteractionText()
 {
+	if (bIsScrubbing)
+		return FText::Format(FText::FromString("Sanitize Progress: {0}%"), FText::AsNumber(FMath::RoundToFloat(((CumulativeDistance * 100) / DistanceThreshold) * 100.0f) / 100.0f));
+	
 	switch(Player->GetHeldItemType())
 	{
 		case EItemType::Disinfectant:
@@ -130,10 +135,28 @@ FText ASanitizer::GetInteractionText()
 	}
 }
 
+void ASanitizer::GetSanitizerState(ESanitizerState& State, int& Amount)
+{
+	State = SanitizerState; 
+	Amount = DisinfectantAmount;
+}
+
+void ASanitizer::SetSanitizerState(ESanitizerState State, int Amount)
+{
+	SanitizerState = State;
+	DisinfectantAmount = Amount;
+	SetWaterMesh();
+}
+
 void ASanitizer::StartSanitizing()
 {
 	if (!bIsScrubbing)
 	{
+		//HUD->HideInteractionWidget();
+		HUD->HideCrosshair();
+		EndFocus();
+		Player->HeldItem->AttachToComponent(Player->GetMesh1P(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("Interacting"));
+		
 		if (APlayerController* PlayerController = GetWorld()->GetFirstPlayerController())
 		{
 
@@ -146,6 +169,7 @@ void ASanitizer::StartSanitizing()
 			GetWorld()->GetGameViewport()->GetViewportSize(ViewportSize);
 			PlayerController->SetMouseLocation(ViewportSize.X / 2, ViewportSize.Y / 2);
 		}
+		
 		bIsScrubbing = true;
 		DistanceThreshold = 4000.0f;
 		CumulativeDistance = 0.0f;
@@ -160,6 +184,8 @@ void ASanitizer::CalculateDistance(FVector MousePosition)
 		return;
 	}
 
+	HUD->UpdateInteractionWidget(GetInteractionText());
+	
 	float DistanceMoved = FVector::Dist(MousePosition, LastMousePosition);
 	CumulativeDistance += DistanceMoved;
 	if (CumulativeDistance >= DistanceThreshold)
@@ -179,7 +205,9 @@ void ASanitizer::CalculateDistance(FVector MousePosition)
 			SanitizerState = ESanitizerState::Default;
 			SanitizerMesh->SetMaterial(2, Materials[1]);
 		}
-		Cast<AInteractionHUD>(GetWorld()->GetFirstPlayerController()->GetHUD())->UpdateInteractionHeader(GetInteractionHeader());
+		HUD->UpdateInteractionHeader(GetInteractionHeader());
+		HUD->ShowCrosshair();
+		Player->HeldItem->AttachToComponent(Player->GetMesh1P(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("AttachSocket"));
 		Cast<ADish>(Player->HeldItem)->ProgressDishState();
 		Player->ToggleMovement(true);
 		FSlateApplication::Get().ClearKeyboardFocus(EFocusCause::Cleared);
@@ -211,14 +239,12 @@ void ASanitizer::SetWaterMesh()
 {
 	switch (SanitizerState)
 	{
-	case ESanitizerState::Default:
-		SanitizerState = ESanitizerState::Sanitized;
-		SanitizerMesh->SetMaterial(2, Materials[0]);
-		break;
-	case ESanitizerState::Sanitized:
-		SanitizerState = ESanitizerState::Default;
-		SanitizerMesh->SetMaterial(2, Materials[1]);
-		break;
+		case ESanitizerState::Default:
+			SanitizerMesh->SetMaterial(2, Materials[1]);
+			break;
+		case ESanitizerState::Sanitized:
+			SanitizerMesh->SetMaterial(2, Materials[0]);
+			break;
 	}
 }
 
@@ -227,8 +253,6 @@ void ASanitizer::InteractedWithDish()
 	if (ADish* TempDish = Cast<ADish>(Player->HeldItem); TempDish->GetDishState() == EDishState::Rinsed)
 	{
 		Player->ToggleMovement(false);
-		Cast<AInteractionHUD>(GetWorld()->GetFirstPlayerController()->GetHUD())->HideInteractionWidget();
-		EndFocus();
 		StartSanitizing();
 	}
 }
@@ -244,12 +268,12 @@ void ASanitizer::InteractedWithDisinfectant()
 	Disinfectant->DisinfectantAmount -= TransferAmount;
 	DisinfectantAmount += TransferAmount;
 	
-	Cast<AInteractionHUD>(GetWorld()->GetFirstPlayerController()->GetHUD())->HideInteractionWidget();
+	HUD->HideInteractionWidget();
 	EndFocus();
 	
 	SanitizerState = ESanitizerState::Sanitized;
 	SanitizerMesh->SetMaterial(2, Materials[0]);
-	Cast<AInteractionHUD>(GetWorld()->GetFirstPlayerController()->GetHUD())->UpdateInteractionHeader(GetInteractionHeader());
+	HUD->UpdateInteractionHeader(GetInteractionHeader());
 }
 
 

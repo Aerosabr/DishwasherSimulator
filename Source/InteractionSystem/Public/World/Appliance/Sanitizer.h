@@ -5,6 +5,7 @@
 #include "Interfaces/InteractionInterface.h"
 #include "Sanitizer.generated.h"
 
+class AInteractionHUD;
 class ADish;
 
 UENUM()
@@ -31,8 +32,15 @@ public:
 	virtual bool CanInteract() override;
 	virtual FText GetInteractionHeader() override;
 	virtual FText GetInteractionText() override;
+
+	void GetSanitizerState(ESanitizerState& State, int& Amount);
+	void SetSanitizerState(ESanitizerState State, int Amount);
 	
 protected:
+
+	UPROPERTY()
+	AInteractionHUD* HUD;
+	
 	UPROPERTY(VisibleAnywhere, Category = "Sanitizer", meta = (DisplayPriority = 0))
 	ESanitizerState SanitizerState;
 	

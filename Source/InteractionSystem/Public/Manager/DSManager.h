@@ -4,6 +4,10 @@
 #include "Engine/GameInstance.h"
 #include "DSManager.generated.h"
 
+class ADisinfectant;
+class ASoap;
+class ASanitizer;
+class AWasher;
 class AStartBell;
 class ADishSpawner;
 class AInteractionHUD;
@@ -17,6 +21,10 @@ public:
 	void ChangeMoney(int amount);
 	void StartDay();
 	void AllDishesWashed();
+
+	void CreateSaveFile();
+	void SaveGame();
+	void LoadGame();
 	
 	FORCEINLINE bool GetOpen() const { return bOpen; };
 	FORCEINLINE int GetMoney() const { return Money; };
@@ -27,6 +35,18 @@ public:
 	
 	UPROPERTY(VisibleAnywhere, Category = "DSManager", meta = (DisplayPriority = 0))
 	ADishSpawner* Spawner;
+
+	UPROPERTY(VisibleAnywhere, Category = "DSManager", meta = (DisplayPriority = 0))
+	TArray<ASoap*> SoapBottles;
+	
+	UPROPERTY(VisibleAnywhere, Category = "DSManager", meta = (DisplayPriority = 0))
+	TArray<ADisinfectant*> DisinfectantBottles;
+	
+	UPROPERTY(VisibleAnywhere, Category = "DSManager", meta = (DisplayPriority = 0))
+	AWasher* Washer;
+    
+	UPROPERTY(VisibleAnywhere, Category = "DSManager", meta = (DisplayPriority = 0))
+	ASanitizer* Sanitizer;
 	
 protected:
 	UPROPERTY(EditAnywhere, Category = "DSManager", meta = (DisplayPriority = 0))
@@ -46,7 +66,17 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "DSManager", meta = (DisplayPriority = 0))
 	AStartBell* Bell;
 	
+	UPROPERTY()
+	AInteractionHUD* HUD;
+
+	UPROPERTY(EditAnywhere, Category = "Item", meta = (DisplayPriority = 0))
+	TSubclassOf<class ADisinfectant> DisinfectantToSpawn;
+
+	UPROPERTY(EditAnywhere, Category = "Item", meta = (DisplayPriority = 0))
+	TSubclassOf<class ASoap> SoapToSpawn;
+	
 	virtual void Init() override;
+	void SpawnStartItems() const;
 	
 	void OnTimerTick();
 };

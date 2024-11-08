@@ -85,6 +85,18 @@ void AInteractionHUD::ToggleMenu()
 	}
 }
 
+void AInteractionHUD::ShowCrosshair() const
+{
+	if (CrosshairWidget)
+		CrosshairWidget->SetVisibility(ESlateVisibility::Visible);
+}
+
+void AInteractionHUD::HideCrosshair() const
+{
+	if (CrosshairWidget)
+		CrosshairWidget->SetVisibility(ESlateVisibility::Collapsed);
+}
+
 void AInteractionHUD::ShowInteractionHeader() const
 {
 	if (InteractionHeader)

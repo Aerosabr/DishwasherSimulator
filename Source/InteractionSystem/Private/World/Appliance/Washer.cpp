@@ -3,6 +3,7 @@
 #include "InteractionSystem/DSCharacter.h"
 #include "Items/Dish.h"
 #include "Items/Soap.h"
+#include "Manager/DSManager.h"
 #include "UserInterface/InteractionHUD.h"
 
 AWasher::AWasher()
@@ -27,10 +28,13 @@ void AWasher::BeginPlay()
 
 	LastMousePosition = FVector::ZeroVector;
 	
-	WasherState = EWasherState::Dirty;
+	WasherState = EWasherState::Default;
 	SetWaterMesh();
 	
 	Player = Cast<ADSCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn());
+	HUD = Cast<AInteractionHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
+	
+	Cast<UDSManager>(GetGameInstance())->Washer = this;
 }
 
 void AWasher::Tick(float DeltaTime)
@@ -62,7 +66,11 @@ void AWasher::Interact(ADSCharacter* PlayerCharacter)
 	switch(PlayerCharacter->GetHeldItemType())
 	{
 		case EItemType::None:
-			
+			WasherState = EWasherState::Default;
+			WasherMesh->SetMaterial(0, Materials[2]);
+			HUD->UpdateInteractionHeader(GetInteractionHeader());
+			HUD->HideInteractionWidget();
+			EndFocus();
 			break;
 		case EItemType::Dish:
 			InteractedWithDish();
@@ -85,7 +93,7 @@ bool AWasher::CanInteract()
 			return WasherState == EWasherState::Dirty;
 
 		case EItemType::Soap:
-			return Cast<ASoap>(Player->HeldItem)->GetSoapAmount() != 0 && SoapAmount != 160;
+			return Cast<ASoap>(Player->HeldItem)->GetSoapAmount() != 0 && SoapAmount != 160 && WasherState != EWasherState::Dirty;
 		
 		case EItemType::Disinfectant:
 			return false;
@@ -118,6 +126,9 @@ FText AWasher::GetInteractionHeader()
 
 FText AWasher::GetInteractionText()
 {
+	if (bIsScrubbing)
+		return FText::Format(FText::FromString("Wash Progress: {0}%"), FText::AsNumber(FMath::RoundToFloat(((CumulativeDistance * 100) / DistanceThreshold) * 100.0f) / 100.0f));
+	
 	switch(Player->GetHeldItemType())
 	{
 		case EItemType::None:
@@ -134,13 +145,30 @@ FText AWasher::GetInteractionText()
 	}
 }
 
+void AWasher::GetWasherState(EWasherState& State, int& Amount)
+{
+	State = WasherState; 
+	Amount = SoapAmount;
+}
+
+void AWasher::SetWasherState(EWasherState State, int Amount)
+{
+	WasherState = State;
+	SoapAmount = Amount;
+	SetWaterMesh();
+}
+
 void AWasher::StartWashing()
 {
 	if (!bIsScrubbing)
 	{
+		//HUD->HideInteractionWidget();
+		HUD->HideCrosshair();
+		EndFocus();
+		Player->HeldItem->AttachToComponent(Player->GetMesh1P(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("Interacting"));
+		
 		if (APlayerController* PlayerController = GetWorld()->GetFirstPlayerController())
 		{
-
 			FInputModeUIOnly InputMode;
 			
 			PlayerController->SetInputMode(InputMode);
@@ -164,6 +192,8 @@ void AWasher::CalculateDistance(FVector MousePosition)
 		return;
 	}
 
+	HUD->UpdateInteractionWidget(GetInteractionText());
+	
 	float DistanceMoved = FVector::Dist(MousePosition, LastMousePosition);
 	CumulativeDistance += DistanceMoved;
 	if (CumulativeDistance >= DistanceThreshold)
@@ -184,7 +214,10 @@ void AWasher::CalculateDistance(FVector MousePosition)
 			WasherState = EWasherState::Dirty;
 			WasherMesh->SetMaterial(0, Materials[1]);
 		}
-		Cast<AInteractionHUD>(GetWorld()->GetFirstPlayerController()->GetHUD())->UpdateInteractionHeader(GetInteractionHeader());
+		
+		HUD->UpdateInteractionHeader(GetInteractionHeader());
+		HUD->ShowCrosshair();
+		Player->HeldItem->AttachToComponent(Player->GetMesh1P(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("AttachSocket"));
 		Cast<ADish>(Player->HeldItem)->ProgressDishState();
 		Player->ToggleMovement(true);
 		FSlateApplication::Get().ClearKeyboardFocus(EFocusCause::Cleared);
@@ -216,16 +249,13 @@ void AWasher::SetWaterMesh()
 {
 	switch (WasherState)
 	{
-	case EWasherState::Default:
-		WasherState = EWasherState::Soap;
+	case EWasherState::Soap:
 		WasherMesh->SetMaterial(0, Materials[0]);
 		break;
-	case EWasherState::Soap:
-		WasherState = EWasherState::Dirty;
+	case EWasherState::Dirty:
 		WasherMesh->SetMaterial(0, Materials[1]);
 		break;
-	case EWasherState::Dirty:
-		WasherState = EWasherState::Default;
+	case EWasherState::Default:
 		WasherMesh->SetMaterial(0, Materials[2]);
 		break;
 	}
@@ -236,8 +266,6 @@ void AWasher::InteractedWithDish()
 	if (ADish* TempDish = Cast<ADish>(Player->HeldItem); TempDish->GetDishState() == EDishState::Scraped)
 	{
 		Player->ToggleMovement(false);
-		Cast<AInteractionHUD>(GetWorld()->GetFirstPlayerController()->GetHUD())->HideInteractionWidget();
-		EndFocus();
 		StartWashing();
 	}
 }
@@ -253,10 +281,10 @@ void AWasher::InteractedWithSoap()
 	Soap->SoapAmount -= TransferAmount;
 	SoapAmount += TransferAmount;
 	
-	Cast<AInteractionHUD>(GetWorld()->GetFirstPlayerController()->GetHUD())->HideInteractionWidget();
+	HUD->HideInteractionWidget();
 	EndFocus();
 	
 	WasherState = EWasherState::Soap;
 	WasherMesh->SetMaterial(0, Materials[0]);
-	Cast<AInteractionHUD>(GetWorld()->GetFirstPlayerController()->GetHUD())->UpdateInteractionHeader(GetInteractionHeader());
+	HUD->UpdateInteractionHeader(GetInteractionHeader());
 }

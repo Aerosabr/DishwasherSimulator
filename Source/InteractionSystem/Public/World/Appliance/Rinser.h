@@ -5,6 +5,7 @@
 #include "Interfaces/InteractionInterface.h"
 #include "Rinser.generated.h"
 
+class AInteractionHUD;
 class ADish;
 
 UCLASS()
@@ -26,6 +27,9 @@ public:
 	virtual FText GetInteractionText() override;
 	
 protected:
+
+	UPROPERTY()
+	AInteractionHUD* HUD;
 	
 	UPROPERTY(EditAnywhere, Category = "Rinser", meta = (DisplayPriority = 0))
 	UStaticMeshComponent* RinserMesh;

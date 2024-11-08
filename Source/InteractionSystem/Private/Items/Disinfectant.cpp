@@ -1,6 +1,7 @@
 #include "Items/Disinfectant.h"
 #include "Data/ItemDataStructs.h"
 #include "InteractionSystem/DSCharacter.h"
+#include "Manager/DSManager.h"
 
 ADisinfectant::ADisinfectant()
 {
@@ -16,6 +17,8 @@ void ADisinfectant::BeginPlay()
 	Super::BeginPlay();
 	
 	DisinfectantAmount = 640;
+	if (UDSManager* GameInstance = Cast<UDSManager>(GetGameInstance()))
+		GameInstance->DisinfectantBottles.Add(this);
 }
 
 void ADisinfectant::Tick(float DeltaTime)

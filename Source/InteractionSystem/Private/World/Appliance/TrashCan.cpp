@@ -4,6 +4,7 @@
 #include "Items/Dish.h"
 #include "Items/Disinfectant.h"
 #include "Items/Soap.h"
+#include "Manager/DSManager.h"
 #include "UserInterface/InteractionHUD.h"
 
 ATrashCan::ATrashCan()
@@ -27,6 +28,7 @@ void ATrashCan::BeginPlay()
 	LastMousePosition = FVector::ZeroVector;
 
 	Player = Cast<ADSCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn());
+	HUD = Cast<AInteractionHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
 }
 
 void ATrashCan::Tick(float DeltaTime)
@@ -64,10 +66,20 @@ void ATrashCan::Interact(ADSCharacter* PlayerCharacter)
 			InteractedWithDish(PlayerCharacter);
 			break;
 		case EItemType::Soap:
-				
+			HUD->HideInteractionWidget();
+			EndFocus();
+			Cast<UDSManager>(GetGameInstance())->SoapBottles.Remove(Cast<ASoap>(PlayerCharacter->HeldItem));
+			PlayerCharacter->HeldItem->Destroy();
+			PlayerCharacter->HeldItem = nullptr;
+			PlayerCharacter->SetIsHoldingItem(false, EItemType::None);
 			break;
 		case EItemType::Disinfectant:
-				
+			HUD->HideInteractionWidget();
+			EndFocus();
+			Cast<UDSManager>(GetGameInstance())->DisinfectantBottles.Remove(Cast<ADisinfectant>(PlayerCharacter->HeldItem));
+			PlayerCharacter->HeldItem->Destroy();
+			PlayerCharacter->HeldItem = nullptr;
+			PlayerCharacter->SetIsHoldingItem(false, EItemType::None);
 			break;
 	}
 }
@@ -99,6 +111,9 @@ FText ATrashCan::GetInteractionHeader()
 
 FText ATrashCan::GetInteractionText()
 {
+	if (bIsScrubbing)
+		return FText::Format(FText::FromString("Scrape Progress: {0}%"), FText::AsNumber(FMath::RoundToFloat(((CumulativeDistance * 100) / DistanceThreshold) * 100.0f) / 100.0f));
+	
 	switch(Player->GetHeldItemType())
 	{
 		case EItemType::Soap:
@@ -118,6 +133,11 @@ void ATrashCan::StartScraping()
 {
 	if (!bIsScrubbing)
 	{
+		//HUD->HideInteractionWidget();
+		HUD->HideCrosshair();
+		EndFocus();
+		Player->HeldItem->AttachToComponent(Player->GetMesh1P(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("Interacting"));
+		
 		if (APlayerController* PlayerController = GetWorld()->GetFirstPlayerController())
 		{
 			FInputModeUIOnly InputMode;
@@ -129,6 +149,7 @@ void ATrashCan::StartScraping()
 			GetWorld()->GetGameViewport()->GetViewportSize(ViewportSize);
 			PlayerController->SetMouseLocation(ViewportSize.X / 2, ViewportSize.Y / 2);
 		}
+		
 		bIsScrubbing = true;
 		DistanceThreshold = 7000.f;
 		CumulativeDistance = 0.0f;
@@ -143,6 +164,8 @@ void ATrashCan::CalculateDistance(FVector MousePosition)
 		return;
 	}
 
+	HUD->UpdateInteractionWidget(GetInteractionText());
+	
 	float DistanceMoved = FVector::Dist(MousePosition, LastMousePosition);
 	CumulativeDistance += DistanceMoved;
 	if (CumulativeDistance >= DistanceThreshold)
@@ -156,7 +179,8 @@ void ATrashCan::CalculateDistance(FVector MousePosition)
 			PlayerController->SetInputMode(FInputModeGameOnly());
 			PlayerController->bShowMouseCursor = false;
 		}
-
+		HUD->ShowCrosshair();
+		Player->HeldItem->AttachToComponent(Player->GetMesh1P(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("AttachSocket"));
 		Cast<ADish>(Player->HeldItem)->ProgressDishState();
 		Player->ToggleMovement(true);
 		FSlateApplication::Get().ClearKeyboardFocus(EFocusCause::Cleared);
@@ -188,8 +212,6 @@ void ATrashCan::InteractedWithDish(ADSCharacter* PlayerCharacter)
 	if (ADish* TempDish = Cast<ADish>(PlayerCharacter->HeldItem); TempDish->GetDishState() == EDishState::Dirty)
 	{
 		PlayerCharacter->ToggleMovement(false);
-		Cast<AInteractionHUD>(GetWorld()->GetFirstPlayerController()->GetHUD())->HideInteractionWidget();
-		EndFocus();
 		StartScraping();
 	}
 }

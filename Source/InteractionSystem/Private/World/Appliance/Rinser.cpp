@@ -25,6 +25,7 @@ void ARinser::BeginPlay()
 	LastMousePosition = FVector::ZeroVector;
 
 	Player = Cast<ADSCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn());
+	HUD = Cast<AInteractionHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
 }
 
 void ARinser::Tick(float DeltaTime)
@@ -85,6 +86,9 @@ FText ARinser::GetInteractionHeader()
 
 FText ARinser::GetInteractionText()
 {
+	if (bIsScrubbing)
+		return FText::Format(FText::FromString("Rinse Progress: {0}%"), FText::AsNumber(FMath::RoundToFloat(((CumulativeDistance * 100) / DistanceThreshold) * 100.0f) / 100.0f));
+	
 	return FText::FromString("Press E To Rinse");
 }
 
@@ -92,9 +96,13 @@ void ARinser::StartRinsing()
 {
 	if (!bIsScrubbing)
 	{
+		//HUD->HideInteractionWidget();
+		HUD->HideCrosshair();
+		EndFocus();
+		Player->HeldItem->AttachToComponent(Player->GetMesh1P(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("Interacting"));
+		
 		if (APlayerController* PlayerController = GetWorld()->GetFirstPlayerController())
 		{
-
 			FInputModeUIOnly InputMode;
 			
 			PlayerController->SetInputMode(InputMode);
@@ -104,6 +112,7 @@ void ARinser::StartRinsing()
 			GetWorld()->GetGameViewport()->GetViewportSize(ViewportSize);
 			PlayerController->SetMouseLocation(ViewportSize.X / 2, ViewportSize.Y / 2);
 		}
+		
 		bIsScrubbing = true;
 		DistanceThreshold = 5000.0f;
 		CumulativeDistance = 0.0f;
@@ -118,6 +127,8 @@ void ARinser::CalculateDistance(FVector MousePosition)
 		return;
 	}
 
+	HUD->UpdateInteractionWidget(GetInteractionText());
+	
 	float DistanceMoved = FVector::Dist(MousePosition, LastMousePosition);
 	CumulativeDistance += DistanceMoved;
 	if (CumulativeDistance >= DistanceThreshold)
@@ -131,7 +142,8 @@ void ARinser::CalculateDistance(FVector MousePosition)
 			PlayerController->SetInputMode(FInputModeGameOnly());
 			PlayerController->bShowMouseCursor = false;
 		}
-		
+		HUD->ShowCrosshair();
+		Player->HeldItem->AttachToComponent(Player->GetMesh1P(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("AttachSocket"));
 		Cast<ADish>(Player->HeldItem)->ProgressDishState();
 		Player->ToggleMovement(true);
 		FSlateApplication::Get().ClearKeyboardFocus(EFocusCause::Cleared);
@@ -164,8 +176,6 @@ void ARinser::InteractedWithDish(ADSCharacter* PlayerCharacter)
 	if (ADish* TempDish = Cast<ADish>(PlayerCharacter->HeldItem); TempDish->GetDishState() == EDishState::Washed)
 	{
 		PlayerCharacter->ToggleMovement(false);
-		Cast<AInteractionHUD>(GetWorld()->GetFirstPlayerController()->GetHUD())->HideInteractionWidget();
-		EndFocus();
 		StartRinsing();
 	}
 }

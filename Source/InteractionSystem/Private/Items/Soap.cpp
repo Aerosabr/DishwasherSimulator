@@ -1,6 +1,7 @@
 #include "Items/Soap.h"
 #include "Data/ItemDataStructs.h"
 #include "InteractionSystem/DSCharacter.h"
+#include "Manager/DSManager.h"
 
 ASoap::ASoap()
 {
@@ -16,6 +17,8 @@ void ASoap::BeginPlay()
 	Super::BeginPlay();
 	
 	SoapAmount = 640;
+	if (UDSManager* GameInstance = Cast<UDSManager>(GetGameInstance()))
+		GameInstance->SoapBottles.Add(this);
 }
 
 void ASoap::Tick(float DeltaTime)

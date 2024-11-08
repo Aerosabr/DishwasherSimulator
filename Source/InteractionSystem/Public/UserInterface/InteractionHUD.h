@@ -38,12 +38,17 @@ public:
 	void HideMenu();
 	void ToggleMenu();
 
+	void ShowCrosshair() const;
+	void HideCrosshair() const;
+	
 	void ShowInteractionHeader() const;
 	void HideInteractionHeader() const;
 	void UpdateInteractionHeader(const FText& InteractableName) const;
+	
 	void ShowInteractionWidget() const;
 	void HideInteractionWidget() const;
 	void UpdateInteractionWidget(const FText& InteractionText) const;
+	
 	void UpdateGameWidgetMoney() const;
 	void UpdateGameWidgetTime() const;
 	

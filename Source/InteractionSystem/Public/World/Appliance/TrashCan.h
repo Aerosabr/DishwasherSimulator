@@ -5,6 +5,7 @@
 #include "Interfaces/InteractionInterface.h"
 #include "TrashCan.generated.h"
 
+class AInteractionHUD;
 class ADish;
 
 UCLASS()
@@ -25,6 +26,9 @@ public:
 	virtual FText GetInteractionHeader() override;
 	virtual FText GetInteractionText() override;
 protected:
+
+	UPROPERTY()
+	AInteractionHUD* HUD;
 	
 	UPROPERTY(EditAnywhere, Category = "TrashCan", meta = (DisplayPriority = 0))
 	UStaticMeshComponent* TrashCanMesh;

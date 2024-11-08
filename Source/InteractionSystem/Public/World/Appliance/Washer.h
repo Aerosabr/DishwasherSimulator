@@ -5,6 +5,7 @@
 #include "Interfaces/InteractionInterface.h"
 #include "Washer.generated.h"
 
+class AInteractionHUD;
 class ADish;
 
 UENUM()
@@ -32,8 +33,14 @@ public:
 	virtual bool CanInteract() override;
 	virtual FText GetInteractionHeader() override;
 	virtual FText GetInteractionText() override;
+
+	void GetWasherState(EWasherState& State, int& Amount);
+	void SetWasherState(EWasherState State, int Amount);
 	
 protected:
+
+	UPROPERTY()
+	AInteractionHUD* HUD;
 	
 	UPROPERTY(VisibleAnywhere, Category = "Washer", meta = (DisplayPriority = 0))
 	EWasherState WasherState;
