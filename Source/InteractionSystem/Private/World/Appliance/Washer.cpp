@@ -179,7 +179,7 @@ void AWasher::StartWashing()
 			PlayerController->SetMouseLocation(ViewportSize.X / 2, ViewportSize.Y / 2);
 		}
 		bIsScrubbing = true;
-		DistanceThreshold = 6000.0f;
+		DistanceThreshold = 300 * Cast<ADish>(Player->HeldItem)->DebrisAmount;
 		CumulativeDistance = 0.0f;
 	}
 }

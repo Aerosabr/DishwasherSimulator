@@ -151,7 +151,7 @@ void ATrashCan::StartScraping()
 		}
 		
 		bIsScrubbing = true;
-		DistanceThreshold = 7000.f;
+		DistanceThreshold = 150 * Cast<ADish>(Player->HeldItem)->DebrisAmount;
 		CumulativeDistance = 0.0f;
 	}
 }

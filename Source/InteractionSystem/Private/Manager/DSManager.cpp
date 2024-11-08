@@ -19,7 +19,7 @@ void UDSManager::Init()
 	Super::Init();
 	
 	Day = 1;
-	Money = 0;
+	Money = 50;
 	Time = 0;
 	bOpen = false;
 
@@ -44,7 +44,7 @@ void UDSManager::SpawnStartItems() const
 
 void UDSManager::OnTimerTick()
 {
-	Time += 3600;
+	Time += 1800;
 	
 	if (Time >= 79200)
 	{
@@ -68,7 +68,7 @@ void UDSManager::StartDay()
 	if (!bOpen)
 	{
 		Time = 36000;
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle,this, &UDSManager::OnTimerTick, 1.0f, true);
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle,this, &UDSManager::OnTimerTick, 5.0f, true);
 		Bell->bCanInteract = false;
 		Spawner->StartSpawning();
 		bOpen = true;
@@ -89,6 +89,8 @@ void UDSManager::CreateSaveFile()
 {
 	USaveGameData* dataToSave = Cast<USaveGameData>(UGameplayStatics::CreateSaveGameObject(USaveGameData::StaticClass()));
 	UGameplayStatics::SaveGameToSlot(dataToSave, "Slot1", 0);
+	SpawnStartItems();
+	SaveGame();
 }
 
 void UDSManager::SaveGame()
@@ -167,7 +169,6 @@ void UDSManager::LoadGame()
 	else if (!UGameplayStatics::DoesSaveGameExist("Slot1", 0))
 	{
 		CreateSaveFile();
-		SpawnStartItems();
 	}
 
 	HUD->UpdateGameWidgetMoney();

@@ -114,7 +114,7 @@ void ARinser::StartRinsing()
 		}
 		
 		bIsScrubbing = true;
-		DistanceThreshold = 5000.0f;
+		DistanceThreshold = 8000.0f;
 		CumulativeDistance = 0.0f;
 	}
 }

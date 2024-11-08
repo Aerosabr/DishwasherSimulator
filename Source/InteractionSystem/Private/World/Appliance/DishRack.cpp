@@ -61,11 +61,11 @@ void ADishRack::Interact(ADSCharacter* PlayerCharacter)
 				GameInstance->Spawner->SpawnedDishes.RemoveSingle(TempDish);
 			Cast<AInteractionHUD>(GetWorld()->GetFirstPlayerController()->GetHUD())->HideInteractionWidget();
 			EndFocus();
+			if (UDSManager* GameInstance = Cast<UDSManager>(GetGameInstance()))
+				GameInstance->ChangeMoney(Cast<ADish>(Player->HeldItem)->Value);
 			PlayerCharacter->HeldItem->Destroy();
 			PlayerCharacter->HeldItem = nullptr;
 			PlayerCharacter->SetIsHoldingItem(false, EItemType::None);
-			if (UDSManager* GameInstance = Cast<UDSManager>(GetGameInstance()))
-				GameInstance->ChangeMoney(1);
 		}
 	}
 }

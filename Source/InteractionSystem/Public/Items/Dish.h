@@ -20,6 +20,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere, Category = "Dish")
 	int DebrisAmount;
+
+	UPROPERTY(VisibleAnywhere, Category = "Dish")
+	int Value;
 	
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
@@ -55,5 +58,4 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Dish")
 	FDataTableRowHandle ItemRowHandle;
 	
-	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 };

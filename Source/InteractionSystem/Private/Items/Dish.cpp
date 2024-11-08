@@ -3,6 +3,7 @@
 #include "NiagaraFunctionLibrary.h"
 #include "Data/ItemDataStructs.h"
 #include "InteractionSystem/DSCharacter.h"
+#include "Kismet/KismetMathLibrary.h"
 
 ADish::ADish()
 {
@@ -20,6 +21,9 @@ void ADish::BeginPlay()
 	Super::BeginPlay();
 
 	DishState = EDishState::Dirty;
+
+	DebrisAmount = UKismetMathLibrary::RandomIntegerInRange(20, 40);
+	Value = UKismetMathLibrary::RandomIntegerInRange(3, 5);
 }
 
 void ADish::Tick(float DeltaTime)
@@ -174,23 +178,5 @@ void ADish::SetDishMesh()
 	
 }
 
-void ADish::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
-{
-	Super::PostEditChangeProperty(PropertyChangedEvent);
-
-	const FName ChangedPropertyName = PropertyChangedEvent.Property ? PropertyChangedEvent.Property->GetFName() : NAME_None;
-
-	if (ChangedPropertyName == GET_MEMBER_NAME_CHECKED(FDataTableRowHandle, RowName))
-	{
-		if (!ItemRowHandle.IsNull())
-		{
-			UE_LOG(LogTemp, Log, TEXT("PostEdit"));
-			const FItemData* ItemData = ItemRowHandle.GetRow<FItemData>(ItemRowHandle.RowName.ToString());
-			DishMeshes = ItemData->AssetData.Meshes;
-			DebrisAmount = ItemData->AssetData.DebrisAmount;
-			SetDishMesh();
-		}
-	}
-}
 
 

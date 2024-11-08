@@ -171,7 +171,7 @@ void ASanitizer::StartSanitizing()
 		}
 		
 		bIsScrubbing = true;
-		DistanceThreshold = 4000.0f;
+		DistanceThreshold = 6000.0f;
 		CumulativeDistance = 0.0f;
 	}
 }
